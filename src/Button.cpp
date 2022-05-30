@@ -20,7 +20,7 @@ void Button::handleInput(const SDL_Event &e)
 			SDL_GetMouseState(&x, &y);
 			SDL_Point mousePoint = {x, y};
 			if (SDL_PointInRect(&mousePoint, &dest))
-				actualGame_->changeGameState(Game::gameStates::playing);
+				actualGame_->changeGameState(Game::gameStates::puttingBoats);
 		} else if (function == "quit")
 		{
 			int x, y;

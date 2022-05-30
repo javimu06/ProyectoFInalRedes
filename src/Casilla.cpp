@@ -10,7 +10,7 @@ Casilla::Casilla(Player *pl, Vector2D pos)
     posicion = pos;
     player = pl;
 
-    setTransform(posicion.getX() * 131 * player->getGM()->scale + environment().width() / 4.4f, posicion.getY() * 131 * player->getGM()->scale + environment().height() * 0.02f);
+    setTransform(posicion.getX() * 131 * player->getGM()->scale + environment().width() / 4.4f, posicion.getY() * 131 * player->getGM()->scale + environment().height() * 0.02f + player->nJugador * 525 * player->getGM()->scale);
     setDimensions(131 * player->getGM()->scale, 131 * player->getGM()->scale);
     setTexture("./resources/images/Casilla.png");
 }
@@ -19,33 +19,40 @@ Casilla::~Casilla() {}
 
 void Casilla::handleInput(const SDL_Event &e)
 {
-    if (e.type == SDL_MOUSEBUTTONDOWN)
+    if (player->getGM()->ActualState == Game::gameStates::playing)
     {
-        int x, y;
-        SDL_GetMouseState(&x, &y);
-        SDL_Point mousePoint = {x, y};
-        if (SDL_PointInRect(&mousePoint, &dest))
+        if (e.type == SDL_MOUSEBUTTONDOWN)
         {
-            // estadoActual = tocado;
-            // int xCell, yCell;
-            // xCell = posicion.getX();
-            // yCell = posicion.getY();
-            // Casilla *aux = player->mapa[yCell][xCell];
-            bool finded = false;
-            for (auto &b : player->boats)
+            //#Comprobador de turno para seleccionar las del contrario
+            if (player->nJugador != player->getGM()->turno)
             {
-                for (auto &c : b->casillasBarco)
+                int x, y;
+                SDL_GetMouseState(&x, &y);
+                SDL_Point mousePoint = {x, y};
+                if (SDL_PointInRect(&mousePoint, &dest))
                 {
-                    if (this == c)
+                    bool finded = false;
+                    for (auto &b : player->boats)
                     {
-                        estadoActual = tocado;
-                        finded = true;
-                        break;
+                        for (auto &c : b->casillasBarco)
+                        {
+                            if (this == c)
+                            {
+                                estadoActual = tocado;
+                                finded = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!finded)
+                    {
+                        estadoActual = agua;
+
+                        //#Cambio de turno
+                        player->getGM()->turno = !player->getGM()->turno;
                     }
                 }
             }
-            if (!finded)
-                estadoActual = agua;
         }
     }
 }

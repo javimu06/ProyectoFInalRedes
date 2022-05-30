@@ -9,18 +9,21 @@
 
 class Player;
 
-class Boat: public GameObject
+class Boat : public GameObject
 {
 public:
-    enum direccionBarco
+    enum direccionBarco : Uint8
     {
-        norte,
-        sur,
-        este,
-        oeste
+        norte = 0,
+        este = 1,
+        sur = 2,
+        oeste = 3
     };
 
-    Boat(Player *pl, Vector2D Icoord, int tamano, direccionBarco dir);
+    bool colocado;
+
+    Boat(Player *pl, Vector2D Icoord, int tam, direccionBarco dir);
+    void ActualizaBarco();
     ~Boat();
 
     void handleInput(const SDL_Event &) override;
@@ -29,11 +32,14 @@ public:
     Vector2D InitCord_;
     Vector2D EndCord_;
     std::vector<Casilla *> casillasBarco;
+    int tamano;
 
     // Devuelve si la coordenada esta contenida en el barco para que posteriormente se modifique el tablero en consecuencia
     bool coordenadaTocaBarco(Vector2D coordenada);
-
+    bool Colocable();
     direccionBarco barcodir;
+
+    bool estaHundido();
 
 private:
     Player *player;

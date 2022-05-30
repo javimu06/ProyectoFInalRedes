@@ -11,11 +11,9 @@
 #include "Button.h"
 #include "Menu.h"
 #include "Image.h"
-#include "Player.h"
 
 Game::Game()
 {
-	ActualState = gameStates::mainMenu;
 }
 
 Game::~Game() {}
@@ -23,32 +21,33 @@ Game::~Game() {}
 void Game::init(int w, int h)
 {
 	Environment::init("My Game", w, h);
+	setup();
+}
 
+void Game::setup()
+{
+	ActualState = gameStates::mainMenu;
+
+	// Menu
 	Menu *m = new Menu(this);
 	m->setTransform(0, 0);
 	m->setDimensions(1920 * scale, 1080 * scale);
 	m->setTexture("./resources/images/MainMenuBackground.png");
-
 	MainMenuObjs_.push_back(m);
 
-	 Tank *t = new Tank(this);
-	 t->setTransform(environment().width() / 2, environment().height() / 2);
-	// t->setDimensions(100 * scale, 100 * scale);
-	// t->setTexture("./resources/images/tank.png");
-	// t->setKeys(SDL_SCANCODE_W, SDL_SCANCODE_S, SDL_SCANCODE_A, SDL_SCANCODE_D);
-	// t->setSpeed(1);
-
-	// objs_.push_back(t);
-
+	// Background
 	Image *background = new Image();
 	background->setTransform(0, 0);
 	background->setDimensions(1920 * scale, 1080 * scale);
 	background->setTexture("./resources/images/Background2.png");
 	objs_.push_back(background);
 
-	Player *player = new Player(this);
+	// Players
+	player = new Player(this, 0);
 	player->setTransform(0, 0);
-	objs_2.push_back(player);
+
+	player2 = new Player(this, 1);
+	player2->setTransform(0, 0);
 }
 
 void Game::run()
@@ -68,6 +67,11 @@ void Game::run()
 				ActualState = gameStates::quit;
 				continue;
 			}
+			else if (event.type == SDL_KEYDOWN && event.key.keysym.scancode == SDL_SCANCODE_SPACE)
+			{
+				restart();
+				return;
+			}
 			if (ActualState == gameStates::mainMenu)
 			{
 				for (auto &o : MainMenuObjs_)
@@ -81,10 +85,16 @@ void Game::run()
 					o->handleInput(event);
 				for (auto &o : objs_2)
 					o->handleInput(event);
+
+				//#Controllar input por turnos
+				if (!turno)
+					player->handleInput(event);
+				else
+					player2->handleInput(event);
 			}
 		}
 
-		// update
+		// Actualizacion del menu
 		if (ActualState == gameStates::mainMenu)
 		{
 			for (auto &o : MainMenuObjs_)
@@ -94,10 +104,33 @@ void Game::run()
 		}
 		else
 		{
+			// Actualizacion de mapas y barcos
 			for (auto &o : objs_)
 				o->update();
 			for (auto &o : objs_2)
 				o->update();
+
+			// ACTUALIZACION DE PLAYER
+			if (ActualState == gameStates::puttingBoats)
+			{
+
+				if (!turno)
+				{
+					player->poniendoBarcos();
+				}
+				else
+				{
+					player2->poniendoBarcos();
+				}
+			}
+			else if (ActualState == gameStates::playing)
+			{
+				// Control fin de juego
+				if (!player->tieneBarcos())
+					ActualState = gameStates::winPlayer2;
+				if (!player2->tieneBarcos())
+					ActualState = gameStates::winPlayer1;
+			}
 		}
 		environment().clearRenderer();
 
@@ -116,6 +149,28 @@ void Game::run()
 				o->render();
 			for (auto &o : objs_2)
 				o->render();
+
+			// if (!turno)
+			player->render();
+			// else
+			player2->render();
+
+			if (ActualState == gameStates::winPlayer1)
+			{
+				Image *playerWin = new Image();
+				playerWin->setTransform(0, 0);
+				playerWin->setDimensions(1920 * scale, 1080 * scale);
+				playerWin->setTexture("./resources/images/PlayerOneWins.png");
+				objs_2.push_back(playerWin);
+			}
+			else if (ActualState == gameStates::winPlayer2)
+			{
+				Image *playerWin = new Image();
+				playerWin->setTransform(0, 0);
+				playerWin->setDimensions(1920 * scale, 1080 * scale);
+				playerWin->setTexture("./resources/images/PlayerTwoWins.png");
+				objs_2.push_back(playerWin);
+			}
 		}
 
 		environment().presentRenderer();
@@ -136,6 +191,15 @@ void Game::shutdown()
 		delete MainMenuObjs_[i];
 	for (unsigned int i = 0; i < MainMenuObjs_2.size(); i++)
 		delete MainMenuObjs_2[i];
+
+	delete player;
+	delete player2;
+}
+
+void Game::restart()
+{
+	// shutdown();
+	// setup();
 }
 
 void Game::changeGameState(gameStates newGS)
