@@ -316,7 +316,6 @@ alloc_data(MESSAGE_SIZE);
 void GameServer::do_games(){
 
 	while(true){
-		std::cout <<"funciono\n";
 
 		/*
 
@@ -337,26 +336,17 @@ void GameServer::do_games(){
 		 // - LOGOUT: Eliminar del vector clients
 
 		 // - MESSAGE: Reenviar el mensaje a todos los clientes (menos el emisor)
-		std::cout <<"funciono1\n";
 
 		Socket* client;
-		std::cout <<"funciono2\n";
-
 		GameMessage msg;
-		std::cout <<"funciono3\n";
 
 		int r = socket.recv(msg, client);
 
-		std::cout <<"funciono4\n";
-
-
 		if (r < 0) {
-			std::cout <<"funciono5\n";
 
 			continue;
 
 		}
-		std::cout <<"funciono\n";
 
 		//while (true)
 

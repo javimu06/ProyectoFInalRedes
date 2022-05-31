@@ -31,12 +31,12 @@ if ((*argv[1]) == '2'){
 
 
     //std::thread net_thread(&GameClient::net_thread, &ec);
-    std::thread net_thread([&ec](){ ec.net_thread(); });
+    std::thread net_thread([&ec](){ ec.net_thread(); }); //el que recibe los mensajes y los interpreta, y tal vez, responder a alguno
     //net_thread.join();
 
     ec.login();
 
-    ec.input_thread();
+    ec.input_thread(); //bucle principal, puede y debe enviar los mensajes
 
 }
 

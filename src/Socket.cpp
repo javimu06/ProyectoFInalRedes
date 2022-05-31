@@ -31,35 +31,26 @@ Socket::Socket(const char* address, const char* port) :sd(-1)
 
 int Socket::recv(Serializable& obj, Socket*& sock)
 {
-		std::cout <<"funciono socket¿?\n";
 
 	struct sockaddr sa;
 	socklen_t sa_len = sizeof(struct sockaddr);
-		std::cout <<"funciono socket¿? 2\n";
 
 	char buffer[MAX_MESSAGE_SIZE];
-		std::cout <<"funciono socket¿? 3\n";
 
 	ssize_t bytes = ::recvfrom(sd, buffer, MAX_MESSAGE_SIZE, 0, &sa, &sa_len);
 
-		std::cout <<"funciono socket¿? 4\n";
 
 	if (bytes <= 0)
 	{
-		std::cout <<"funciono socket¿? mal\n";
 		return -1;
 	}
-		std::cout <<"funciono socket¿? 5\n";
 
 	if (sock != 0)
 	{
-		std::cout <<"funciono socket¿? nuevo\n";
 		sock = new Socket(&sa, sa_len);
 	}
-		std::cout <<"funciono socket¿? 6\n";
 
 	obj.from_bin(buffer);
-		std::cout <<"funciono socket¿? 7\n";
 
 	return 0;
 }

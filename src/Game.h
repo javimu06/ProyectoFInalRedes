@@ -164,6 +164,8 @@ private:
      * Nick del usuario
      */
     std::string nick;
+
+    Game* g;
 };
 
 
