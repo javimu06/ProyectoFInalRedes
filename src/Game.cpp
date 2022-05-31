@@ -332,20 +332,26 @@ void GameServer::do_games(){
 		 // - LOGOUT: Eliminar del vector clients
 
 		 // - MESSAGE: Reenviar el mensaje a todos los clientes (menos el emisor)
+		std::cout <<"funciono1\n";
 
 		Socket* client;
+		std::cout <<"funciono2\n";
 
 		GameMessage msg;
+		std::cout <<"funciono3\n";
 
 		int r = socket.recv(msg, client);
 
+		std::cout <<"funciono4\n";
 
 
 		if (r < 0) {
+			std::cout <<"funciono5\n";
 
 			continue;
 
 		}
+		std::cout <<"funciono\n";
 
 		//while (true)
 
@@ -426,4 +432,129 @@ void GameServer::do_games(){
 		//	}
 
 	}
+}
+
+
+
+//el cliente
+
+
+void GameClient::login()
+
+{
+
+	std::string msg;
+	GameMessage em(nick, msg);
+
+	em.type = GameMessage::LOGIN;
+
+
+
+	socket.send(em, socket);
+
+}
+
+
+void GameClient::logout()
+
+{
+
+	std::string msg;
+
+
+
+	GameMessage em(nick, msg);
+
+	em.type = GameMessage::LOGOUT;
+
+
+
+	socket.send(em, socket);
+
+}
+
+
+void GameClient::input_thread()
+
+{
+
+	while (true)
+
+	{
+
+		// Leer stdin con std::getline
+
+		std::string msg;
+
+		std::getline(std::cin, msg);
+
+
+
+		//mensaje para desconectarse del servidor
+
+		if (msg == "LOGOUT")
+
+		{
+
+			logout();
+
+			break;
+
+		}
+
+		else
+
+		{
+
+			// Enviar al servidor usando socket
+
+			GameMessage em(nick, msg);
+
+			em.type = GameMessage::MESSAGE;
+
+			socket.send(em, socket);
+
+		}
+
+	}
+
+}
+
+
+void GameClient::net_thread()
+
+{
+
+	while (true)
+
+	{
+
+		//Recibir Mensajes de red
+
+		//Mostrar en pantalla el mensaje de la forma "nick: mensaje"
+
+		GameMessage em;
+
+
+
+		socket.recv(em);
+
+
+
+		if (em.nick != nick) {
+
+
+
+			std::cout << em.nick << ": " << em.message << "\n";
+
+		}
+
+		else {
+
+			std::cout << em.message << "\n";
+
+		}
+
+	}
+
 }

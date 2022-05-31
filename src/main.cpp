@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <iostream>
+#include <thread>
 
 #include "Game.h"
 
@@ -16,6 +17,23 @@ void start(){
 }
 
 int main(int argc, char *argv[]){
+
+
+if ((*argv[1]) == '1'){
+
+    GameServer server("127.0.0.1", "7777");
+    server.do_games();
+}
+if ((*argv[1]) == '2'){
+    GameClient ec("127.0.0.1", "7777", "marco");
+
+    //std::thread net_thread([&ec](){ ec.net_thread(); });
+
+    ec.login();
+
+    ec.input_thread();
+}
+
     try {
         start();
     }
