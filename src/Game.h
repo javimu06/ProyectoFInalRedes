@@ -15,6 +15,7 @@
 #include "Serializable.h"
 #include "Socket.h"
 
+
 class GameObject;
 class SDL_Renderer;
 
@@ -27,6 +28,7 @@ public:
     void init(int w, int h);
     void setup();
     void run();
+    void actualiza();
     void shutdown();
     void restart();
 
@@ -52,7 +54,7 @@ public:
     bool turno = false;
     void cambiaTurno() { turno = !turno; }
 
-private:
+
     std::vector<GameObject *> objs_;
     std::vector<GameObject *> objs_2;
     std::vector<GameObject *> MainMenuObjs_;
@@ -75,7 +77,8 @@ static const size_t MESSAGE_SIZE = sizeof(char) * 88 + sizeof(uint8_t);
     {
         LOGIN   = 0,
         MESSAGE = 1,
-        LOGOUT  = 2
+        LOGOUT  = 2,
+        ACTUALIZACASILLA = 3
     };
 
     GameMessage(){};
@@ -93,80 +96,6 @@ static const size_t MESSAGE_SIZE = sizeof(char) * 88 + sizeof(uint8_t);
 
 };
 
-
-
-
-class GameServer{
-    public:
-    GameServer(const char * s, const char * p): socket(s, p)
-    {
-        socket.bind();
-    };
-    /**
-     *  Thread principal del servidor recive mensajes en el socket y
-     *  lo distribuye a los clientes. Mantiene actualizada la lista de clientes
-     */
-    void do_games();
-    private:
-    /**
-     *  Lista de clientes conectados al servidor de Chat, representados por
-     *  su socket
-     */
-    std::vector<std::unique_ptr<Socket>> clients;
-
-    /**
-     * Socket del servidor
-     */
-    Socket socket;
-};
-
-class GameClient{
-
- public:
-    /**
-     * @param s dirección del servidor
-     * @param p puerto del servidor
-     * @param n nick del usuario
-     */
-    GameClient(const char * s, const char * p, const char * n):socket(s, p),
-        nick(n){};
-
-    /**
-     *  Envía el mensaje de login al servidor
-     */
-    void login();
-
-    /**
-     *  Envía el mensaje de logout al servidor
-     */
-    void logout();
-
-    /**
-     *  Rutina principal para el Thread de E/S. Lee datos de STDIN (std::getline)
-     *  y los envía por red vía el Socket.
-     */
-    void input_thread();
-
-    /**
-     *  Rutina del thread de Red. Recibe datos de la red y los "renderiza"
-     *  en STDOUT
-     */
-    void net_thread();
-
-private:
-
-    /**
-     * Socket para comunicar con el servidor
-     */
-    Socket socket;
-
-    /**
-     * Nick del usuario
-     */
-    std::string nick;
-
-    Game* g;
-};
 
 
 #endif

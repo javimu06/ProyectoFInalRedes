@@ -52,150 +52,63 @@ void Game::setup()
 	player2 = new Player(this, 1);
 	player2->setTransform(0, 0);
 
-
 	// ChatClient ec("127.0.0.1", "1500", "antonio");
 
-    // std::thread net_thread([&ec](){ ec.net_thread(); });
+	// std::thread net_thread([&ec](){ ec.net_thread(); });
 
-    // ec.login();
+	// ec.login();
 
-    // ec.input_thread();
-
+	// ec.input_thread();
 }
 
 void Game::run()
 {
-	SDL_Event event;
+}
 
-	// animation loop
-	while (ActualState != gameStates::quit)
+void Game::actualiza()
+{
+	// Actualizacion del menu
+	if (ActualState == gameStates::mainMenu)
 	{
-		Uint32 startTime = environment().currRealTime();
+		for (auto &o : MainMenuObjs_)
+			o->update();
+		for (auto &u : MainMenuObjs_2)
+			u->update();
+	}
+	else
+	{
+		// Actualizacion de mapas y barcos
+		for (auto &o : objs_)
+			o->update();
+		for (auto &o : objs_2)
+			o->update();
 
-		// handle input
-		while (SDL_PollEvent(&event))
+		// ACTUALIZACION DE PLAYER
+		if (ActualState == gameStates::puttingBoats)
 		{
-			if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.scancode == SDL_SCANCODE_ESCAPE))
+
+			if (!turno)
 			{
-				ActualState = gameStates::quit;
-				continue;
-			}
-			else if (event.type == SDL_KEYDOWN && event.key.keysym.scancode == SDL_SCANCODE_SPACE)
-			{
-				restart();
-				return;
-			}
-			if (ActualState == gameStates::mainMenu)
-			{
-				for (auto &o : MainMenuObjs_)
-					o->handleInput(event);
-				for (auto &u : MainMenuObjs_2)
-					u->handleInput(event);
+				player->poniendoBarcos();
+				//# Enviar mensaje a servidor de que estas listo para empezar la partida
+				//# Enviar mensaje al servidor con tu array de barcos
+				//# Controlar input por turnos
+				//! Quitar el if/else de !turno y eliminar player2->poniendoBarcos();
 			}
 			else
 			{
-				for (auto &o : objs_)
-					o->handleInput(event);
-				for (auto &o : objs_2)
-					o->handleInput(event);
-
-				//#Controllar input por turnos
-				if (!turno)
-					player->handleInput(event);
-				else
-					player2->handleInput(event);
+				// player2->poniendoBarcos();
 			}
 		}
-
-		// Actualizacion del menu
-		if (ActualState == gameStates::mainMenu)
+		else if (ActualState == gameStates::playing)
 		{
-			for (auto &o : MainMenuObjs_)
-				o->update();
-			for (auto &u : MainMenuObjs_2)
-				u->update();
-		}
-		else
-		{
-			// Actualizacion de mapas y barcos
-			for (auto &o : objs_)
-				o->update();
-			for (auto &o : objs_2)
-				o->update();
-
-			// ACTUALIZACION DE PLAYER
-			if (ActualState == gameStates::puttingBoats)
+			// Control fin de juego
+			//#Enviar que jugador gano
+			if (!player->tieneBarcos())
 			{
-
-				if (!turno)
-				{
-					player->poniendoBarcos();
-					//# Enviar mensaje a servidor de que estas listo para empezar la partida
-					//# Enviar mensaje al servidor con tu array de barcos
-					//# Controlar input por turnos
-					//! Quitar el if/else de !turno y eliminar player2->poniendoBarcos();
-				}
-				else
-				{
-					// player2->poniendoBarcos();
-				}
-			}
-			else if (ActualState == gameStates::playing)
-			{
-				// Control fin de juego
-				//#Enviar que jugador gano
-				if (!player->tieneBarcos())
-				{
-					changeGameState(winPlayer2);
-				}
+				changeGameState(winPlayer2);
 			}
 		}
-		environment().clearRenderer();
-
-		// render
-
-		if (ActualState == gameStates::mainMenu)
-		{
-			for (auto &o : MainMenuObjs_)
-				o->render();
-			for (auto &u : MainMenuObjs_2)
-				u->render();
-		}
-		else
-		{
-			for (auto &o : objs_)
-				o->render();
-			for (auto &o : objs_2)
-				o->render();
-
-			// if (!turno)
-			player->render();
-			// else
-			player2->render();
-
-			if (ActualState == gameStates::winPlayer1)
-			{
-				Image *playerWin = new Image();
-				playerWin->setTransform(0, 0);
-				playerWin->setDimensions(1920 * scale, 1080 * scale);
-				playerWin->setTexture("./resources/images/PlayerOneWins.png");
-				objs_2.push_back(playerWin);
-			}
-			else if (ActualState == gameStates::winPlayer2)
-			{
-				Image *playerWin = new Image();
-				playerWin->setTransform(0, 0);
-				playerWin->setDimensions(1920 * scale, 1080 * scale);
-				playerWin->setTexture("./resources/images/PlayerTwoWins.png");
-				objs_2.push_back(playerWin);
-			}
-		}
-
-		environment().presentRenderer();
-		Uint32 frameTime = environment().currRealTime() - startTime;
-
-		if (frameTime < 20)
-			SDL_Delay(20 - frameTime);
 	}
 }
 
@@ -229,63 +142,42 @@ void Game::changeGameState(gameStates newGS)
 void Game::addObjectList(GameObject *a) { objs_2.push_back(a); }
 void Game::addObjectMenuList(GameObject *a) { MainMenuObjs_2.push_back(a); }
 
-
-
-
-
-
 void GameMessage::to_bin()
 
 {
 
 	alloc_data(MESSAGE_SIZE);
 
-
-
 	memset(_data, 0, MESSAGE_SIZE);
 
+	// Serializar los campos type, nick y message en el buffer _data
 
-
-	//Serializar los campos type, nick y message en el buffer _data
-
-	char* tmp = _data;
+	char *tmp = _data;
 
 	memcpy(tmp, &type, sizeof(type));
 
 	tmp += sizeof(type);
 
-
-
 	memcpy(tmp, nick.c_str(), sizeof(char) * NICK_SIZE);
 
 	tmp += sizeof(char) * NICK_SIZE;
 
-
-
 	memcpy(tmp, message.c_str(), sizeof(char) * message.length());
 
-	//tmp += sizeof(char) * MSG_SIZE;
+	// tmp += sizeof(char) * MSG_SIZE;
 
-	//no ahce falta ya que no vamos a continuar serializando
-
-
-
+	// no ahce falta ya que no vamos a continuar serializando
 }
 
+int GameMessage::from_bin(char *bobj)
+{
+	alloc_data(MESSAGE_SIZE);
 
+	memcpy(static_cast<void *>(_data), bobj, MESSAGE_SIZE);
 
-int GameMessage::from_bin(char * bobj){
-alloc_data(MESSAGE_SIZE);
+	// Reconstruir la clase usando el buffer _data
 
-	memcpy(static_cast<void*>(_data), bobj, MESSAGE_SIZE);
-
-
-
-	//Reconstruir la clase usando el buffer _data
-
-	char* tmp = _data;
-
-
+	char *tmp = _data;
 
 	memcpy(&type, tmp, sizeof(int8_t));
 
@@ -301,255 +193,5 @@ alloc_data(MESSAGE_SIZE);
 
 	memcpy(&message[0], tmp, sizeof(char) * 80);
 
-
-
 	return 0;
-
-
-
-}
-
-
-
-
-
-void GameServer::do_games(){
-
-	while(true){
-
-		/*
-
-		 * NOTA: los clientes están definidos con "smart pointers", es necesario
-
-		 * crear un unique_ptr con el objeto socket recibido y usar std::move
-
-		 * para añadirlo al vector
-
-		 */
-
-
-
-		 //Recibir Mensajes en y en función del tipo de mensaje
-
-		 // - LOGIN: Añadir al vector clients
-
-		 // - LOGOUT: Eliminar del vector clients
-
-		 // - MESSAGE: Reenviar el mensaje a todos los clientes (menos el emisor)
-
-		Socket* client;
-		GameMessage msg;
-
-		int r = socket.recv(msg, client);
-
-		if (r < 0) {
-
-			continue;
-
-		}
-
-		//while (true)
-
-		//{
-
-
-
-		int count = 0;
-
-		std::unique_ptr<Socket> soc(client);
-
-
-
-		switch (msg.type)		// LOGIN = 0, MESSAGE = 1, LOGOUT = 2
-
-		{
-
-		case GameMessage::LOGIN:
-
-			//soc = std::unique_ptr<Socket>(client) ;
-
-			clients.push_back(std::move(soc));
-
-			std::cout << msg.nick.c_str() << " logeado " << std::endl;
-
-			break;
-
-		case  GameMessage::LOGOUT:
-
-			for (auto&& sock : clients)
-
-			{
-
-				if ((*sock == *client))
-
-				{
-
-					clients.erase(clients.begin() + count);
-
-					break;
-
-				}
-
-				count++;
-
-			}
-
-			std::cout << msg.nick.c_str() << " desconectado" << std::endl;
-
-
-
-			break;
-
-		case GameMessage::MESSAGE:
-
-			for (auto&& sock : clients)
-
-			{
-
-				if (!(*sock == *client))
-
-					socket.send(msg, *sock);
-
-			}
-
-			std::cout << msg.nick.c_str() << " mensaje enviado" << std::endl;
-
-			break;
-
-		default:
-
-			break;
-
-		}
-
-		std::cout << "Conectado: " << clients.size() << std::endl;
-
-		//	}
-
-	}
-}
-
-
-
-//el cliente
-
-
-void GameClient::login()
-
-{
-
-	std::string msg;
-	GameMessage em(nick, msg);
-
-	em.type = GameMessage::LOGIN;
-
-
-
-	socket.send(em, socket);
-
-}
-
-
-void GameClient::logout()
-
-{
-
-	std::string msg;
-
-
-
-	GameMessage em(nick, msg);
-
-	em.type = GameMessage::LOGOUT;
-
-
-
-	socket.send(em, socket);
-
-}
-
-
-void GameClient::input_thread()
-
-{
-
-	while (true)
-
-	{
-
-		// Leer stdin con std::getline
-
-		std::string msg;
-
-		std::getline(std::cin, msg);
-
-
-
-		//mensaje para desconectarse del servidor
-
-		if (msg == "LOGOUT")
-
-		{
-
-			logout();
-
-			break;
-
-		}
-
-		else
-
-		{
-
-			// Enviar al servidor usando socket
-
-			GameMessage em(nick, msg);
-
-			em.type = GameMessage::MESSAGE;
-
-			socket.send(em, socket);
-
-		}
-
-	}
-
-}
-
-
-void GameClient::net_thread()
-
-{
-
-	while (true)
-
-	{
-
-		//Recibir Mensajes de red
-
-		//Mostrar en pantalla el mensaje de la forma "nick: mensaje"
-
-		GameMessage em;
-
-
-
-		socket.recv(em);
-
-
-
-		if (em.nick != nick) {
-
-
-
-			std::cout << em.nick << ": " << em.message << "\n";
-
-		}
-
-		else {
-
-			std::cout << em.message << "\n";
-
-		}
-
-	}
-
 }
