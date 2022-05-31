@@ -1,4 +1,5 @@
 #include "Game.h"
+#include <thread>
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
@@ -11,6 +12,8 @@
 #include "Button.h"
 #include "Menu.h"
 #include "Image.h"
+
+//#include "../servidores/Chat.h"
 
 Game::Game()
 {
@@ -48,6 +51,16 @@ void Game::setup()
 
 	player2 = new Player(this, 1);
 	player2->setTransform(0, 0);
+
+
+	// ChatClient ec("127.0.0.1", "1500", "antonio");
+
+    // std::thread net_thread([&ec](){ ec.net_thread(); });
+
+    // ec.login();
+
+    // ec.input_thread();
+
 }
 
 void Game::run()
@@ -210,3 +223,207 @@ void Game::changeGameState(gameStates newGS)
 
 void Game::addObjectList(GameObject *a) { objs_2.push_back(a); }
 void Game::addObjectMenuList(GameObject *a) { MainMenuObjs_2.push_back(a); }
+
+
+
+
+
+
+void GameMessage::to_bin()
+
+{
+
+	alloc_data(MESSAGE_SIZE);
+
+
+
+	memset(_data, 0, MESSAGE_SIZE);
+
+
+
+	//Serializar los campos type, nick y message en el buffer _data
+
+	char* tmp = _data;
+
+	memcpy(tmp, &type, sizeof(type));
+
+	tmp += sizeof(type);
+
+
+
+	memcpy(tmp, nick.c_str(), sizeof(char) * NICK_SIZE);
+
+	tmp += sizeof(char) * NICK_SIZE;
+
+
+
+	memcpy(tmp, message.c_str(), sizeof(char) * message.length());
+
+	//tmp += sizeof(char) * MSG_SIZE;
+
+	//no ahce falta ya que no vamos a continuar serializando
+
+
+
+}
+
+
+
+int GameMessage::from_bin(char * bobj){
+alloc_data(MESSAGE_SIZE);
+
+	memcpy(static_cast<void*>(_data), bobj, MESSAGE_SIZE);
+
+
+
+	//Reconstruir la clase usando el buffer _data
+
+	char* tmp = _data;
+
+
+
+	memcpy(&type, tmp, sizeof(int8_t));
+
+	tmp += sizeof(int8_t);
+
+	nick.resize(sizeof(char) * 8, '\0');
+
+	memcpy(&nick[0], tmp, sizeof(char) * 8);
+
+	tmp += sizeof(char) * 8;
+
+	message.resize(sizeof(char) * 80, '\0');
+
+	memcpy(&message[0], tmp, sizeof(char) * 80);
+
+
+
+	return 0;
+
+
+
+}
+
+
+
+
+
+void GameServer::do_games(){
+
+	while(true){
+		std::cout <<"funciono\n";
+
+		/*
+
+		 * NOTA: los clientes están definidos con "smart pointers", es necesario
+
+		 * crear un unique_ptr con el objeto socket recibido y usar std::move
+
+		 * para añadirlo al vector
+
+		 */
+
+
+
+		 //Recibir Mensajes en y en función del tipo de mensaje
+
+		 // - LOGIN: Añadir al vector clients
+
+		 // - LOGOUT: Eliminar del vector clients
+
+		 // - MESSAGE: Reenviar el mensaje a todos los clientes (menos el emisor)
+
+		Socket* client;
+
+		GameMessage msg;
+
+		int r = socket.recv(msg, client);
+
+
+
+		if (r < 0) {
+
+			continue;
+
+		}
+
+		//while (true)
+
+		//{
+
+
+
+		int count = 0;
+
+		std::unique_ptr<Socket> soc(client);
+
+
+
+		switch (msg.type)		// LOGIN = 0, MESSAGE = 1, LOGOUT = 2
+
+		{
+
+		case GameMessage::LOGIN:
+
+			//soc = std::unique_ptr<Socket>(client) ;
+
+			clients.push_back(std::move(soc));
+
+			std::cout << msg.nick.c_str() << " logeado " << std::endl;
+
+			break;
+
+		case  GameMessage::LOGOUT:
+
+			for (auto&& sock : clients)
+
+			{
+
+				if ((*sock == *client))
+
+				{
+
+					clients.erase(clients.begin() + count);
+
+					break;
+
+				}
+
+				count++;
+
+			}
+
+			std::cout << msg.nick.c_str() << " desconectado" << std::endl;
+
+
+
+			break;
+
+		case GameMessage::MESSAGE:
+
+			for (auto&& sock : clients)
+
+			{
+
+				if (!(*sock == *client))
+
+					socket.send(msg, *sock);
+
+			}
+
+			std::cout << msg.nick.c_str() << " mensaje enviado" << std::endl;
+
+			break;
+
+		default:
+
+			break;
+
+		}
+
+		std::cout << "Conectado: " << clients.size() << std::endl;
+
+		//	}
+
+	}
+}
