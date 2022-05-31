@@ -15,11 +15,19 @@ public:
         agua,
         tocado
     };
-    Casilla(Player* pl, Vector2D pos);
+    Casilla(Player *pl, Vector2D pos);
+    Casilla();
     ~Casilla();
 
     void handleInput(const SDL_Event &) override;
     void update() override;
+
+
+    void operator=(Casilla *b)
+    {
+        posicion = b->posicion;
+        estadoActual = b->estadoActual;
+    };
 
     estado estadoActual = predeterminado;
     Vector2D posicion;

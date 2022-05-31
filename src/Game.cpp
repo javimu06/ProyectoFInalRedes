@@ -130,19 +130,24 @@ void Game::run()
 				if (!turno)
 				{
 					player->poniendoBarcos();
+					//# Enviar mensaje a servidor de que estas listo para empezar la partida
+					//# Enviar mensaje al servidor con tu array de barcos
+					//# Controlar input por turnos
+					//! Quitar el if/else de !turno y eliminar player2->poniendoBarcos();
 				}
 				else
 				{
-					player2->poniendoBarcos();
+					// player2->poniendoBarcos();
 				}
 			}
 			else if (ActualState == gameStates::playing)
 			{
 				// Control fin de juego
+				//#Enviar que jugador gano
 				if (!player->tieneBarcos())
-					ActualState = gameStates::winPlayer2;
-				if (!player2->tieneBarcos())
-					ActualState = gameStates::winPlayer1;
+				{
+					changeGameState(winPlayer2);
+				}
 			}
 		}
 		environment().clearRenderer();

@@ -15,6 +15,8 @@ Casilla::Casilla(Player *pl, Vector2D pos)
     setTexture("./resources/images/Casilla.png");
 }
 
+Casilla::Casilla() {}
+
 Casilla::~Casilla() {}
 
 void Casilla::handleInput(const SDL_Event &e)
@@ -31,26 +33,8 @@ void Casilla::handleInput(const SDL_Event &e)
                 SDL_Point mousePoint = {x, y};
                 if (SDL_PointInRect(&mousePoint, &dest))
                 {
-                    bool finded = false;
-                    for (auto &b : player->boats)
-                    {
-                        for (auto &c : b->casillasBarco)
-                        {
-                            if (this == c)
-                            {
-                                estadoActual = tocado;
-                                finded = true;
-                                break;
-                            }
-                        }
-                    }
-                    if (!finded)
-                    {
-                        estadoActual = agua;
-
-                        //#Cambio de turno
-                        player->getGM()->turno = !player->getGM()->turno;
-                    }
+                    //# Enviar actualizaCasilla al servidor para que lo mande al cliente 1
+                    player->actualizaCasilla(posicion);
                 }
             }
         }

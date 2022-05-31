@@ -20,7 +20,12 @@ public:
     void render() override;
 
     void poniendoBarcos();
+
+    //# metodos red
     bool tieneBarcos();
+    void actualizaCasilla(Vector2D pos);
+    void cambiaCasilla(Vector2D pos, Casilla::estado est);
+
 
     int mapaSizeX = 8;
     int mapaSizeY = 4;
@@ -30,6 +35,8 @@ public:
     Game *getGM() { return gameManager_; }
 
     int nJugador;
+    bool alive = true;
+
 private:
     Game *gameManager_;
     int numBarcos = 4;
