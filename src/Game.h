@@ -42,7 +42,8 @@ public:
     void addObjectList(GameObject *a);
     void addObjectMenuList(GameObject *a);
 
-    bool turno;
+    bool turno = false;
+    void cambiaTurno() { turno = !turno; }
 
 private:
     std::vector<GameObject *> objs_;

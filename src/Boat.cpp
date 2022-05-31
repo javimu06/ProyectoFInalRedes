@@ -222,7 +222,7 @@ bool Boat::Colocable()
         return false;
 }
 
-//Recorre todas las casillas del barco y si encuentra una que no esta tocada es que no se ha hundido
+// Recorre todas las casillas del barco y si encuentra una que no esta tocada es que no se ha hundido
 bool Boat::estaHundido()
 {
     for (auto &c : casillasBarco)

@@ -9,12 +9,12 @@ Player::Player(Game *gm, int jug) : GameObject()
     gameManager_ = gm;
     nJugador = jug;
 
-    for (int i = 0; i < mapaSizeY; ++i)
+    for (int j = 0; j < mapaSizeY; ++j)
     {
-        for (int j = 0; j < mapaSizeX; ++j)
+        for (int i = 0; i < mapaSizeX; ++i)
         {
-            mapa[i][j] = new Casilla(this, Vector2D(j, i));
-            gameManager_->addObjectList(mapa[i][j]);
+            mapa[j][i] = new Casilla(this, Vector2D(i, j));
+            gameManager_->addObjectList(mapa[j][i]);
         }
     }
 }
@@ -23,7 +23,7 @@ Player::~Player() {}
 
 void Player::handleInput(const SDL_Event &e) {}
 void Player::update() {}
-void Player::render(){}
+void Player::render() {}
 
 void Player::poniendoBarcos()
 {
@@ -45,11 +45,17 @@ void Player::poniendoBarcos()
         }
         else
         {
-            //#Pasar al otro jugador
-            if (!gameManager_->turno)
-                gameManager_->turno = true;
-            else
-                gameManager_->ActualState = Game::gameStates::playing;
+            // if (!gameManager_->turno)
+            // {
+            //     gameManager_->cambiaTurno();
+            // }
+            // else
+            // {
+
+            //# Avisar al servidor de que pusiste tus barcos y estas listo para empezar el juego
+            gameManager_->ActualState = Game::gameStates::playing;
+
+            //}
         }
     }
 }
@@ -65,3 +71,42 @@ bool Player::tieneBarcos()
     return false;
 }
 
+// Pregunta
+void Player::actualizaCasilla(Vector2D pos)
+{
+    int x, y;
+    x = pos.getX();
+    y = pos.getY();
+
+    if (mapa[y][x]->estadoActual == Casilla::predeterminado)
+    {
+        bool finded = false;
+        for (auto &b : boats)
+        {
+            for (auto &c : b->casillasBarco)
+            {
+                if (pos.getX() == c->posicion.getX() && pos.getY() == c->posicion.getY())
+                {
+                    //#Actualizacion de casilla
+                    cambiaCasilla(pos, Casilla::tocado);
+                    finded = true;
+                    break;
+                }
+            }
+        }
+        if (!finded)
+        {
+            //#Cambio de turno y actualizacion de casilla
+            cambiaCasilla(pos, Casilla::agua);
+            getGM()->turno = !getGM()->turno;
+        }
+    }
+}
+
+// Respuesta
+void Player::cambiaCasilla(Vector2D pos, Casilla::estado est)
+{
+    int y = pos.getY();
+    int x = pos.getX();
+    mapa[y][x]->estadoActual = est;
+}
