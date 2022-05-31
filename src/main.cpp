@@ -16,6 +16,8 @@ void start(){
     g.shutdown();
 }
 
+
+
 int main(int argc, char *argv[]){
 
 
@@ -27,11 +29,15 @@ if ((*argv[1]) == '1'){
 if ((*argv[1]) == '2'){
     GameClient ec("127.0.0.1", "7777", "marco");
 
-    //std::thread net_thread([&ec](){ ec.net_thread(); });
+
+    //std::thread net_thread(&GameClient::net_thread, &ec);
+    std::thread net_thread([&ec](){ ec.net_thread(); });
+    //net_thread.join();
 
     ec.login();
 
     ec.input_thread();
+
 }
 
     try {
