@@ -1,71 +1,72 @@
-// #include "Game.h"
-// #include <thread>
+#include "GameMessage.h"
 
-// #include <SDL2/SDL.h>
-// #include <SDL2/SDL_image.h>
-// #include <SDL2/SDL_timer.h>
+#include <thread>
 
-// #include "Environment.h"
-// #include "GameObject.h"
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_timer.h>
 
-// #include "Tank.h"
-// #include "Button.h"
-// #include "Menu.h"
-// #include "Image.h"
+#include "Environment.h"
+#include "GameObject.h"
 
-// //#include "../servidores/Chat.h"
+#include "Tank.h"
+#include "Button.h"
+#include "Menu.h"
+#include "Image.h"
 
-// void GameMessage::to_bin()
+//#include "../servidores/Chat.h"
 
-// {
+void GameMessage::to_bin()
 
-// 	alloc_data(MESSAGE_SIZE);
+{
 
-// 	memset(_data, 0, MESSAGE_SIZE);
+	alloc_data(MESSAGE_SIZE);
 
-// 	// Serializar los campos type, nick y message en el buffer _data
+	memset(_data, 0, MESSAGE_SIZE);
 
-// 	char *tmp = _data;
+	// Serializar los campos type, nick y message en el buffer _data
 
-// 	memcpy(tmp, &type, sizeof(type));
+	char *tmp = _data;
 
-// 	tmp += sizeof(type);
+	memcpy(tmp, &type, sizeof(type));
 
-// 	memcpy(tmp, nick.c_str(), sizeof(char) * NICK_SIZE);
+	tmp += sizeof(type);
 
-// 	tmp += sizeof(char) * NICK_SIZE;
+	memcpy(tmp, nick.c_str(), sizeof(char) * NICK_SIZE);
 
-// 	memcpy(tmp, message.c_str(), sizeof(char) * message.length());
+	tmp += sizeof(char) * NICK_SIZE;
 
-// 	// tmp += sizeof(char) * MSG_SIZE;
+	memcpy(tmp, message.c_str(), sizeof(char) * message.length());
 
-// 	// no ahce falta ya que no vamos a continuar serializando
-// }
+	// tmp += sizeof(char) * MSG_SIZE;
 
-// int GameMessage::from_bin(char *bobj)
-// {
-// 	alloc_data(MESSAGE_SIZE);
+	// no ahce falta ya que no vamos a continuar serializando
+}
 
-// 	memcpy(static_cast<void *>(_data), bobj, MESSAGE_SIZE);
+int GameMessage::from_bin(char *bobj)
+{
+	alloc_data(MESSAGE_SIZE);
 
-// 	// Reconstruir la clase usando el buffer _data
+	memcpy(static_cast<void *>(_data), bobj, MESSAGE_SIZE);
 
-// 	char *tmp = _data;
+	// Reconstruir la clase usando el buffer _data
 
-// 	memcpy(&type, tmp, sizeof(int8_t));
+	char *tmp = _data;
 
-// 	tmp += sizeof(int8_t);
+	memcpy(&type, tmp, sizeof(int8_t));
 
-// 	nick.resize(sizeof(char) * 8, '\0');
+	tmp += sizeof(int8_t);
 
-// 	memcpy(&nick[0], tmp, sizeof(char) * 8);
+	nick.resize(sizeof(char) * 8, '\0');
 
-// 	tmp += sizeof(char) * 8;
+	memcpy(&nick[0], tmp, sizeof(char) * 8);
 
-// 	message.resize(sizeof(char) * 80, '\0');
+	tmp += sizeof(char) * 8;
 
-// 	memcpy(&message[0], tmp, sizeof(char) * 80);
+	message.resize(sizeof(char) * 80, '\0');
 
-// 	return 0;
-// }
+	memcpy(&message[0], tmp, sizeof(char) * 80);
+
+	return 0;
+}
 

@@ -15,6 +15,7 @@
 #include "Serializable.h"
 #include "Socket.h"
 
+#include "GameMessage.h"
 #include "Game.h"
 
 

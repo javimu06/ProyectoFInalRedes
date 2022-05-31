@@ -64,37 +64,6 @@ public:
     Player *player2;
 };
 
-class GameMessage: public Serializable{
-
-    public:
-static const size_t MESSAGE_SIZE = sizeof(char) * 88 + sizeof(uint8_t);
-
-    static const size_t NICK_SIZE = 8;
-
-    static const size_t MSG_SIZE = 80;
-
-    enum MessageType
-    {
-        LOGIN   = 0,
-        MESSAGE = 1,
-        LOGOUT  = 2,
-        ACTUALIZACASILLA = 3
-    };
-
-    GameMessage(){};
-
-    GameMessage(const std::string& n, const std::string& m):nick(n),message(m){};
-
-    void to_bin();
-
-    int from_bin(char * bobj);
-
-    uint8_t type;
-
-    std::string nick;
-    std::string message;
-
-};
 
 
 

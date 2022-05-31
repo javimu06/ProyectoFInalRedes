@@ -13,6 +13,8 @@
 #include "Menu.h"
 #include "Image.h"
 
+#include "GameMessage.h"
+
 //#include "../servidores/Chat.h"
 
 void GameServer::do_games()

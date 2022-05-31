@@ -1,58 +1,54 @@
-// #ifndef GAMEMESSAGE_H_
-// #define GAMEMESSAGE_H_
+#ifndef GAMEMESSAGE_H_
+#define GAMEMESSAGE_H_
 
-// #include <string>
-// #include <unistd.h>
-// #include <string.h>
-// #include <vector>
-// #include <memory>
+#include <string>
+#include <unistd.h>
+#include <string.h>
+#include <vector>
+#include <memory>
 
-// #include <SDL2/SDL.h>
+#include <SDL2/SDL.h>
 
-// #include "macros.h"
-// #include "Player.h"
+#include "macros.h"
+#include "Player.h"
 
-// #include "Serializable.h"
-// #include "Socket.h"
+#include "Serializable.h"
+#include "Socket.h"
 
-// #include "Game.h"
+#include "Game.h"
 
+class GameMessage: public Serializable{
 
-// class GameObject;
-// class SDL_Renderer;
+    public:
+static const size_t MESSAGE_SIZE = sizeof(char) * 88 + sizeof(uint8_t);
 
-// class GameMessage: public Serializable{
+    static const size_t NICK_SIZE = 8;
 
-//     public:
-// static const size_t MESSAGE_SIZE = sizeof(char) * 88 + sizeof(uint8_t);
+    static const size_t MSG_SIZE = 80;
 
-//     static const size_t NICK_SIZE = 8;
+    enum MessageType
+    {
+        LOGIN   = 0,
+        MESSAGE = 1,
+        LOGOUT  = 2,
+        ACTUALIZACASILLA = 3
+    };
 
-//     static const size_t MSG_SIZE = 80;
+    GameMessage(){};
 
-//     enum MessageType
-//     {
-//         LOGIN   = 0,
-//         MESSAGE = 1,
-//         LOGOUT  = 2,
-//         ACTUALIZACASILLA = 3
-//     };
+    GameMessage(const std::string& n, const std::string& m):nick(n),message(m){};
 
-//     GameMessage(){};
+    void to_bin();
 
-//     GameMessage(const std::string& n, const std::string& m):nick(n),message(m){};
+    int from_bin(char * bobj);
 
-//     void to_bin();
+    uint8_t type;
 
-//     int from_bin(char * bobj);
+    std::string nick;
+    std::string message;
 
-//     uint8_t type;
-
-//     std::string nick;
-//     std::string message;
-
-// };
+};
 
 
 
-// #endif
+#endif

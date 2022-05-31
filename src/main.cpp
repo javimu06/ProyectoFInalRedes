@@ -5,6 +5,7 @@
 #include "Game.h"
 #include "GameServer.h"
 #include "GameClient.h"
+#include "GameMessage.h"
 
 void start()
 {
