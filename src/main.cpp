@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
 
         ec.input_thread(); // bucle principal, puede y debe enviar los mensajes
 
-        game.shutdown();
+        ec.g->shutdown();
     }
 
     try

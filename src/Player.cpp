@@ -45,17 +45,8 @@ void Player::poniendoBarcos()
         }
         else
         {
-            // if (!gameManager_->turno)
-            // {
-            //     gameManager_->cambiaTurno();
-            // }
-            // else
-            // {
-
             //# Avisar al servidor de que pusiste tus barcos y estas listo para empezar el juego
             gameManager_->ActualState = Game::gameStates::playing;
-
-            //}
         }
     }
 }

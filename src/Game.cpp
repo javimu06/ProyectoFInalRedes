@@ -86,19 +86,8 @@ void Game::actualiza()
 		// ACTUALIZACION DE PLAYER
 		if (ActualState == gameStates::puttingBoats)
 		{
-
-			if (!turno)
-			{
-				player->poniendoBarcos();
-				//# Enviar mensaje a servidor de que estas listo para empezar la partida
-				//# Enviar mensaje al servidor con tu array de barcos
-				//# Controlar input por turnos
-				//! Quitar el if/else de !turno y eliminar player2->poniendoBarcos();
-			}
-			else
-			{
-				// player2->poniendoBarcos();
-			}
+			player->poniendoBarcos();
+			//# Enviar mensaje a servidor de que estas listo para empezar la partida
 		}
 		else if (ActualState == gameStates::playing)
 		{
@@ -141,4 +130,3 @@ void Game::changeGameState(gameStates newGS)
 
 void Game::addObjectList(GameObject *a) { objs_2.push_back(a); }
 void Game::addObjectMenuList(GameObject *a) { MainMenuObjs_2.push_back(a); }
-

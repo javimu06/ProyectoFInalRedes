@@ -23,8 +23,8 @@ public:
 
     //# metodos red
     bool tieneBarcos();
-    void actualizaCasilla(Vector2D pos);
-    void cambiaCasilla(Vector2D pos, Casilla::estado est);
+    void actualizaCasilla(Vector2D pos);                    //Se ejecuta en el cliente al que se envia (cliente 2)
+    void cambiaCasilla(Vector2D pos, Casilla::estado est);  //Se ejecuta en el cliente al que se envia (que seria el primer cliente que realizo la primera llamada)
 
 
     int mapaSizeX = 8;
