@@ -46,107 +46,110 @@ void GameClient::input_thread()
 
 {
 
-	while (true)
+	SDL_Event event;
+
+	// animation loop
+	while (g->ActualState != Game::gameStates::quit)
 	{
-		SDL_Event event;
+		Uint32 startTime = environment().currRealTime();
 
-		// animation loop
-		while (g->ActualState != Game::gameStates::quit)
+		// handle input
+		while (SDL_PollEvent(&event))
 		{
-			Uint32 startTime = environment().currRealTime();
-
-			// handle input
-			while (SDL_PollEvent(&event))
+			if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.scancode == SDL_SCANCODE_ESCAPE))
 			{
-				if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.scancode == SDL_SCANCODE_ESCAPE))
-				{
-					g->ActualState = Game::gameStates::quit;
-					continue;
-				}
-				else if (event.type == SDL_KEYDOWN && event.key.keysym.scancode == SDL_SCANCODE_SPACE)
-				{
-					g->restart();
-					return;
-				}
-				if (g->ActualState == Game::gameStates::mainMenu)
-				{
-					for (auto &o : g->MainMenuObjs_)
-						o->handleInput(event);
-					for (auto &u : g->MainMenuObjs_2)
-						u->handleInput(event);
-				}
-				else
-				{
-					for (auto &o : g->objs_)
-						o->handleInput(event);
-					for (auto &o : g->objs_2)
-						o->handleInput(event);
-
-					//#Controllar input por turnos
-					if (!g->turno)
-						g->player->handleInput(event);
-					else
-						g->player2->handleInput(event);
-				}
+				g->ActualState = Game::gameStates::quit;
+				continue;
 			}
-
-			g->actualiza();
-			environment().clearRenderer();
-
-			// render
-
+			else if (event.type == SDL_KEYDOWN && event.key.keysym.scancode == SDL_SCANCODE_SPACE)
+			{
+				g->restart();
+				return;
+			}
 			if (g->ActualState == Game::gameStates::mainMenu)
 			{
 				for (auto &o : g->MainMenuObjs_)
-					o->render();
+					o->handleInput(event);
 				for (auto &u : g->MainMenuObjs_2)
-					u->render();
+					u->handleInput(event);
 			}
 			else
 			{
 				for (auto &o : g->objs_)
-					o->render();
+					o->handleInput(event);
 				for (auto &o : g->objs_2)
-					o->render();
+					o->handleInput(event);
 
-				// if (!turno)
-				g->player->render();
-				// else
-				g->player2->render();
-
-				if (g->ActualState == Game::gameStates::winPlayer1)
-				{
-					Image *playerWin = new Image();
-					playerWin->setTransform(0, 0);
-					playerWin->setDimensions(1920 * g->scale, 1080 * g->scale);
-					playerWin->setTexture("./resources/images/PlayerOneWins.png");
-					g->objs_2.push_back(playerWin);
-				}
-				else if (g->ActualState == Game::gameStates::winPlayer2)
-				{
-					Image *playerWin = new Image();
-					playerWin->setTransform(0, 0);
-					playerWin->setDimensions(1920 * g->scale, 1080 * g->scale);
-					playerWin->setTexture("./resources/images/PlayerTwoWins.png");
-					g->objs_2.push_back(playerWin);
-				}
+				//#Controllar input por turnos
+				if (!g->turno)
+					g->player->handleInput(event);
+				else
+					g->player2->handleInput(event);
 			}
-
-			environment().presentRenderer();
-			Uint32 frameTime = environment().currRealTime() - startTime;
-
-			if (frameTime < 20)
-				SDL_Delay(20 - frameTime);
 		}
 
-		// // Leer stdin con std::getline
-		// std::string msg;
-		// std::getline(std::cin, msg);
-		// // Enviar al servidor usando socket
-		// GameMessage em(nick, msg);
-		// em.type = GameMessage::MESSAGE;
-		// socket.send(em, socket);
+		g->actualiza();
+		environment().clearRenderer();
+
+		// render
+
+		if (g->ActualState == Game::gameStates::mainMenu)
+		{
+			for (auto &o : g->MainMenuObjs_)
+				o->render();
+			for (auto &u : g->MainMenuObjs_2)
+				u->render();
+		}
+		else
+		{
+			for (auto &o : g->objs_)
+				o->render();
+			for (auto &o : g->objs_2)
+				o->render();
+
+			// if (!turno)
+			g->player->render();
+			// else
+			g->player2->render();
+
+			if (g->ActualState == Game::gameStates::winPlayer1)
+			{
+				Image *playerWin = new Image();
+				playerWin->setTransform(0, 0);
+				playerWin->setDimensions(1920 * g->scale, 1080 * g->scale);
+				playerWin->setTexture("./resources/images/PlayerOneWins.png");
+				g->objs_2.push_back(playerWin);
+			}
+			else if (g->ActualState == Game::gameStates::winPlayer2)
+			{
+				Image *playerWin = new Image();
+				playerWin->setTransform(0, 0);
+				playerWin->setDimensions(1920 * g->scale, 1080 * g->scale);
+				playerWin->setTexture("./resources/images/PlayerTwoWins.png");
+				g->objs_2.push_back(playerWin);
+
+				// Enviar al servidor usando socket
+				GameMessage em(nick, "ajjajajaja ta ganao");
+				em.type = GameMessage::LOGOUT;
+				socket.send(em, socket);
+
+			}
+		}
+
+		environment().presentRenderer();
+		Uint32 frameTime = environment().currRealTime() - startTime;
+
+		if (frameTime < 20)
+			SDL_Delay(20 - frameTime);
 	}
+
+	// // Leer stdin con std::getline
+	// std::string msg;
+	// std::getline(std::cin, msg);
+	// // Enviar al servidor usando socket
+	// GameMessage em(nick, msg);
+	// em.type = GameMessage::MESSAGE;
+	// socket.send(em, socket);
 }
 
 void GameClient::net_thread()

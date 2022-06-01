@@ -124,8 +124,9 @@ void Game::restart()
 
 void Game::changeGameState(gameStates newGS)
 {
-
 	ActualState = newGS;
+
+
 }
 
 void Game::addObjectList(GameObject *a) { objs_2.push_back(a); }
