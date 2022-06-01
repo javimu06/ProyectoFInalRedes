@@ -38,7 +38,13 @@ void GameMessage::to_bin()
 
 	memcpy(tmp, message.c_str(), sizeof(char) * message.length());
 
-	// tmp += sizeof(char) * MSG_SIZE;
+	tmp += sizeof(char) * MSG_SIZE;
+
+	memcpy(tmp, &x, sizeof(int));
+
+	tmp += sizeof(int);
+	
+	memcpy(tmp, &y, sizeof(int));
 
 	// no ahce falta ya que no vamos a continuar serializando
 }
@@ -66,6 +72,14 @@ int GameMessage::from_bin(char *bobj)
 	message.resize(sizeof(char) * 80, '\0');
 
 	memcpy(&message[0], tmp, sizeof(char) * 80);
+
+	tmp += sizeof(char) * 80;
+
+	memcpy(&x, tmp, sizeof(int));
+
+	tmp += sizeof(int);
+	
+	memcpy(&y, tmp, sizeof(int));
 
 	return 0;
 }
