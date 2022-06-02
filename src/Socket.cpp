@@ -57,22 +57,13 @@ int Socket::recv(Serializable& obj, Socket*& sock)
 
 int Socket::send(Serializable& obj, const Socket& sock)
 {
-
-	std::cout << "Socket lanzado\n";
-
 	//Serializar el objeto
 	obj.to_bin();
-	std::cout << "Socket lanzado\n";
-
 	//Enviar el objeto binario a sock usando el socket sd
 	int data = sendto(sd, (void*)obj.data(), obj.size(), 0, (struct sockaddr*)&sock.sa, sock.sa_len);
-	std::cout << "Socket lanzado\n";
-
 	if (data <= 0){
-		std::cout << "Socket lanzado mal\n";
 		return -1;
 	}
-	std::cout << "Socket lanzado bien\n";
 
 	return 0;
 }

@@ -94,6 +94,7 @@ class GameClient{
      *  Envía el mensaje de logout al servidor
      */
     void logout();
+    void WriteMesage(std::string msg);
 
     /**
      *  Rutina principal para el Thread de E/S. Lee datos de STDIN (std::getline)

@@ -16,6 +16,92 @@
 //#include "../servidores/Chat.h"
 
 
+void GameMessage::to_bin()
+
+{
+
+	if (type == MessageType::MESSAGE){
+
+		alloc_data(MESSAGE_SIZE);
+		char *tmp = _data;
+
+		memcpy(tmp, &type, sizeof(type));
+		tmp += sizeof(type);
+		
+		memcpy(tmp, nick.c_str(), sizeof(char) * NICK_SIZE);
+		tmp += sizeof(char) * NICK_SIZE;
+
+		memcpy(tmp, message.c_str(), sizeof(char) * message.length());
+	}
+	else //Login, loggout
+	{
+
+		alloc_data(sizeof(type) + sizeof(char) * NICK_SIZE); //solo lleva el tipo de mensaje y el nick
+		char *tmp = _data;
+		//type
+		memcpy(tmp, &type, sizeof(type));
+		tmp += sizeof(type);
+		//nick
+		memcpy(tmp, nick.c_str(), sizeof(char) * NICK_SIZE);
+		tmp += sizeof(char) * NICK_SIZE;
+
+	}
+}
+
+int GameMessage::from_bin(char *data)
+{
+
+	//memcpy(static_cast<void *>(_data), bobj, MESSAGE_SIZE);
+	char *tmp = data;
+	memcpy(&type, tmp, sizeof(type));
+	tmp += sizeof(type);
+
+	if (type == MessageType::MESSAGE){
+		
+		nick.resize(sizeof(char) * 8, '\0');
+
+		memcpy(&nick[0], tmp, sizeof(char) * 8);
+		tmp += sizeof(char) * 8;	
+
+		message.resize(sizeof(char) * 80, '\0');
+
+		memcpy(&message[0], tmp, sizeof(char) * 80);
+	}
+	else //login Logout, etc
+	{
+
+		nick.resize(sizeof(char) * 8, '\0');
+
+		memcpy(&nick[0], tmp, sizeof(char) * 8);
+		tmp += sizeof(char) * 8;	
+	}
+
+
+
+	//alloc_data(MESSAGE_SIZE);
+
+
+	// Reconstruir la clase usando el buffer _data
+
+
+	//memcpy(static_cast<void *>(_data), bobj, MESSAGE_SIZE);
+
+
+
+
+	// tmp += sizeof(char) * 80;
+
+	// memcpy(&x, tmp, sizeof(int));
+
+	// tmp += sizeof(int);
+	
+	// memcpy(&y, tmp, sizeof(int));
+
+	return 0;
+}
+
+
+
 
 void GameClient::init(int w, int h)
 {
@@ -71,6 +157,10 @@ void GameClient::run()
 		// handle input
 		while (SDL_PollEvent(&event))
 		{
+
+			if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.scancode == SDL_SCANCODE_T))
+			WriteMesage("hola");
+
 			if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.scancode == SDL_SCANCODE_ESCAPE))
 			{
 				ActualState = gameStates::quit;
@@ -193,6 +283,10 @@ void GameClient::run()
 		if (frameTime < 20)
 			SDL_Delay(20 - frameTime);
 	}
+
+	//se ha salido de la aplicacion
+
+	logout();
 }
 
 void GameClient::shutdown()
@@ -228,84 +322,6 @@ void GameClient::changeGameState(gameStates newGS)
 
 void GameClient::addObjectList(GameObject *a) { objs_2.push_back(a); }
 void GameClient::addObjectMenuList(GameObject *a) { MainMenuObjs_2.push_back(a); }
-
-
-
-
-
-
-void GameMessage::to_bin()
-
-{
-
-	alloc_data(MESSAGE_SIZE);
-
-
-
-	memset(_data, 0, MESSAGE_SIZE);
-
-
-
-	//Serializar los campos type, nick y message en el buffer _data
-
-	char* tmp = _data;
-
-	memcpy(tmp, &type, sizeof(type));
-
-	tmp += sizeof(type);
-
-
-
-	memcpy(tmp, nick.c_str(), sizeof(char) * NICK_SIZE);
-
-	tmp += sizeof(char) * NICK_SIZE;
-
-
-
-	memcpy(tmp, message.c_str(), sizeof(char) * message.length());
-
-	//tmp += sizeof(char) * MSG_SIZE;
-
-	//no ahce falta ya que no vamos a continuar serializando
-
-
-
-}
-
-int GameMessage::from_bin(char * bobj){
-alloc_data(MESSAGE_SIZE);
-
-	memcpy(static_cast<void*>(_data), bobj, MESSAGE_SIZE);
-
-
-
-	//Reconstruir la clase usando el buffer _data
-
-	char* tmp = _data;
-
-
-
-	memcpy(&type, tmp, sizeof(int8_t));
-
-	tmp += sizeof(int8_t);
-
-	nick.resize(sizeof(char) * 8, '\0');
-
-	memcpy(&nick[0], tmp, sizeof(char) * 8);
-
-	tmp += sizeof(char) * 8;
-
-	message.resize(sizeof(char) * 80, '\0');
-
-	memcpy(&message[0], tmp, sizeof(char) * 80);
-
-
-
-	return 0;
-
-
-
-}
 
 void GameServer::do_games(){
 
@@ -440,21 +456,17 @@ void GameClient::login()
 }
 
 void GameClient::logout()
-
 {
-
 	std::string msg;
-
-
-
 	GameMessage em(nick, msg);
-
 	em.type = GameMessage::LOGOUT;
-
-
-
 	socket.send(em, socket);
+}
 
+void GameClient::WriteMesage(std::string msg){
+	GameMessage em(nick, msg);
+	em.type = GameMessage::MESSAGE;
+	socket.send(em, socket);
 }
 
 void GameClient::input_thread()
