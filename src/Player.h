@@ -8,11 +8,11 @@
 #include "Casilla.h"
 
 #include <vector>
-class Game;
+class GameClient;
 class Player : public GameObject
 {
 public:
-    Player(Game *GM_, int jug);
+    Player(GameClient *GM_, int jug);
     virtual ~Player();
 
     void handleInput(const SDL_Event &) override;
@@ -32,13 +32,13 @@ public:
     Casilla *mapa[4][8];
     std::vector<Boat *> boats;
 
-    Game *getGM() { return gameManager_; }
+    GameClient *getGM() { return gameManager_; }
 
     int nJugador;
     bool alive = true;
 
 private:
-    Game *gameManager_;
+    GameClient *gameManager_;
     int numBarcos = 4;
     int numBarcosColocados = 0;
     Boat *aux = nullptr;

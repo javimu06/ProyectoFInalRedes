@@ -3,11 +3,11 @@
 
 #include "GameObject.h"
 
-class Game;
+class GameClient;
 
 class Button: public GameObject {
 public:
-    Button(Game* G, std::string fc);
+    Button(GameClient* G, std::string fc);
     virtual ~Button();
 
     void handleInput(const SDL_Event &) override;
@@ -15,7 +15,7 @@ public:
 
 
 private:
-    Game* actualGame_;
+    GameClient* actualGame_;
     std::string function;
 
 };

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <string>
 
-Player::Player(Game *gm, int jug) : GameObject()
+Player::Player(GameClient *gm, int jug) : GameObject()
 {
     gameManager_ = gm;
     nJugador = jug;
@@ -27,7 +27,7 @@ void Player::render() {}
 
 void Player::poniendoBarcos()
 {
-    if (gameManager_->ActualState == Game::gameStates::puttingBoats)
+    if (gameManager_->ActualState == GameClient::gameStates::puttingBoats)
     {
         if (numBarcosColocados != numBarcos)
         {
@@ -53,7 +53,7 @@ void Player::poniendoBarcos()
             // {
 
             //# Avisar al servidor de que pusiste tus barcos y estas listo para empezar el juego
-            gameManager_->ActualState = Game::gameStates::playing;
+            gameManager_->ActualState = GameClient::gameStates::playing;
 
             //}
         }

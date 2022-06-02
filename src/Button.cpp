@@ -2,7 +2,7 @@
 #include "Environment.h"
 #include "Game.h"
 
-Button::Button(Game *G, std::string fct) : GameObject()
+Button::Button(GameClient *G, std::string fct) : GameObject()
 {
 	actualGame_ = G;
 	function = fct;
@@ -20,14 +20,14 @@ void Button::handleInput(const SDL_Event &e)
 			SDL_GetMouseState(&x, &y);
 			SDL_Point mousePoint = {x, y};
 			if (SDL_PointInRect(&mousePoint, &dest))
-				actualGame_->changeGameState(Game::gameStates::puttingBoats);
+				actualGame_->changeGameState(GameClient::gameStates::puttingBoats);
 		} else if (function == "quit")
 		{
 			int x, y;
 			SDL_GetMouseState(&x, &y);
 			SDL_Point mousePoint = {x, y};
 			if (SDL_PointInRect(&mousePoint, &dest))
-				actualGame_->changeGameState(Game::gameStates::quit);
+				actualGame_->changeGameState(GameClient::gameStates::quit);
 		}
 	}
 }

@@ -18,49 +18,6 @@
 class GameObject;
 class SDL_Renderer;
 
-class Game
-{
-public:
-    Game();
-    virtual ~Game();
-
-    void init(int w, int h);
-    void setup();
-    void run();
-    void shutdown();
-    void restart();
-
-    float scale = 0.74f;
-
-    enum gameStates
-    {
-        playing,
-        mainMenu,
-        quit,
-        puttingBoats,
-        winPlayer1,
-        winPlayer2
-    };
-
-    gameStates ActualState;
-
-    void changeGameState(gameStates newGS);
-
-    void addObjectList(GameObject *a);
-    void addObjectMenuList(GameObject *a);
-
-    bool turno = false;
-    void cambiaTurno() { turno = !turno; }
-
-private:
-    std::vector<GameObject *> objs_;
-    std::vector<GameObject *> objs_2;
-    std::vector<GameObject *> MainMenuObjs_;
-    std::vector<GameObject *> MainMenuObjs_2;
-
-    Player *player;
-    Player *player2;
-};
 
 class GameMessage: public Serializable{
 
@@ -92,9 +49,6 @@ static const size_t MESSAGE_SIZE = sizeof(char) * 88 + sizeof(uint8_t);
     std::string message;
 
 };
-
-
-
 
 class GameServer{
     public:
@@ -165,7 +119,46 @@ private:
      */
     std::string nick;
 
-    Game* g;
+
+//EL GAME
+public:
+
+    void init(int w, int h);
+    void setup();
+    void run();
+    void shutdown();
+    void restart();
+
+    float scale = 0.74f;
+
+    enum gameStates
+    {
+        playing,
+        mainMenu,
+        quit,
+        puttingBoats,
+        winPlayer1,
+        winPlayer2
+    };
+
+    gameStates ActualState;
+
+    void changeGameState(gameStates newGS);
+
+    void addObjectList(GameObject *a);
+    void addObjectMenuList(GameObject *a);
+
+    bool turno = false;
+    void cambiaTurno() { turno = !turno; }
+
+private:
+    std::vector<GameObject *> objs_;
+    std::vector<GameObject *> objs_2;
+    std::vector<GameObject *> MainMenuObjs_;
+    std::vector<GameObject *> MainMenuObjs_2;
+
+    Player *player;
+    Player *player2;
 };
 
 

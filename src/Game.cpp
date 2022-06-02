@@ -15,19 +15,15 @@
 
 //#include "../servidores/Chat.h"
 
-Game::Game()
-{
-}
 
-Game::~Game() {}
 
-void Game::init(int w, int h)
+void GameClient::init(int w, int h)
 {
 	Environment::init("My Game", w, h);
 	setup();
 }
 
-void Game::setup()
+void GameClient::setup()
 {
 	ActualState = gameStates::mainMenu;
 
@@ -63,7 +59,7 @@ void Game::setup()
 
 }
 
-void Game::run()
+void GameClient::run()
 {
 	SDL_Event event;
 
@@ -199,7 +195,7 @@ void Game::run()
 	}
 }
 
-void Game::shutdown()
+void GameClient::shutdown()
 {
 	for (unsigned int i = 0; i < objs_.size(); i++)
 		delete objs_[i];
@@ -214,20 +210,24 @@ void Game::shutdown()
 	delete player2;
 }
 
-void Game::restart()
+void GameClient::restart()
 {
 	// shutdown();
 	// setup();
 }
 
-void Game::changeGameState(gameStates newGS)
+// void Game::setGameClient(GameClient* gc_){
+// 	gc = gc_;
+// }
+
+void GameClient::changeGameState(gameStates newGS)
 {
 
 	ActualState = newGS;
 }
 
-void Game::addObjectList(GameObject *a) { objs_2.push_back(a); }
-void Game::addObjectMenuList(GameObject *a) { MainMenuObjs_2.push_back(a); }
+void GameClient::addObjectList(GameObject *a) { objs_2.push_back(a); }
+void GameClient::addObjectMenuList(GameObject *a) { MainMenuObjs_2.push_back(a); }
 
 
 
@@ -272,8 +272,6 @@ void GameMessage::to_bin()
 
 }
 
-
-
 int GameMessage::from_bin(char * bobj){
 alloc_data(MESSAGE_SIZE);
 
@@ -308,10 +306,6 @@ alloc_data(MESSAGE_SIZE);
 
 
 }
-
-
-
-
 
 void GameServer::do_games(){
 
@@ -429,11 +423,7 @@ void GameServer::do_games(){
 	}
 }
 
-
-
 //el cliente
-
-
 void GameClient::login()
 
 {
@@ -448,7 +438,6 @@ void GameClient::login()
 	socket.send(em, socket);
 
 }
-
 
 void GameClient::logout()
 
@@ -468,10 +457,16 @@ void GameClient::logout()
 
 }
 
-
 void GameClient::input_thread()
 
 {
+	//este es el ciclo del juego principal, aqui vamso a iniciar el game
+
+	//abrir el game
+	init(1920*scale, 1080*scale);
+	//g->setGameClient(this*);
+    run();
+    shutdown();
 
 	while (true)
 

@@ -21,7 +21,7 @@ Casilla::~Casilla() {}
 
 void Casilla::handleInput(const SDL_Event &e)
 {
-    if (player->getGM()->ActualState == Game::gameStates::playing)
+    if (player->getGM()->ActualState == GameClient::gameStates::playing)
     {
         if (e.type == SDL_MOUSEBUTTONDOWN)
         {

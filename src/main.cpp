@@ -4,17 +4,17 @@
 
 #include "Game.h"
 
-void start(){
-    // char buffer[256];    
-    // getcwd( buffer, 256 );
-    // printf("%s\n", buffer);
+// void start(){
+//     // char buffer[256];    
+//     // getcwd( buffer, 256 );
+//     // printf("%s\n", buffer);
 
-    Game g;
+//     Game g;
 
-    g.init(1920*g.scale, 1080*g.scale);
-    g.run();
-    g.shutdown();
-}
+//     g.init(1920*g.scale, 1080*g.scale);
+//     g.run();
+//     g.shutdown();
+// }
 
 
 
@@ -40,25 +40,25 @@ if ((*argv[1]) == '2'){
 
 }
 
-    try {
-        start();
-    }
-    catch(const std::string& e)
-    {
-        std::cerr << e << '\n';
-    }
-    catch(const char* e)
-    {
-        std::cerr << e << '\n';
-    }
-    catch(const std::exception& e)
-    {
-        std::cerr << e.what() << '\n';
-    }
-    catch(...)
-    {
-        std::cerr << "Caught an exception ok unknown type...\n";
-    }
+    // try {
+    //     start();
+    // }
+    // catch(const std::string& e)
+    // {
+    //     std::cerr << e << '\n';
+    // }
+    // catch(const char* e)
+    // {
+    //     std::cerr << e << '\n';
+    // }
+    // catch(const std::exception& e)
+    // {
+    //     std::cerr << e.what() << '\n';
+    // }
+    // catch(...)
+    // {
+    //     std::cerr << "Caught an exception ok unknown type...\n";
+    // }
     
     return 0;
 }

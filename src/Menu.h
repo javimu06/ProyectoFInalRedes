@@ -4,19 +4,19 @@
 #include "GameObject.h"
 #include "Button.h"
 
-class Game;
+class GameClient;
 
 class Menu : public GameObject
 {
 public:
-    Menu(Game *GM);
+    Menu(GameClient *GM);
     virtual ~Menu();
 
     void handleInput(const SDL_Event &) override;
     void update() override;
 
 private:
-    Game *gameManager;
+    GameClient *gameManager;
 
     Button *a;
     Button *b;

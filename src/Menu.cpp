@@ -2,7 +2,7 @@
 #include "Environment.h"
 #include "Game.h"
 
-Menu::Menu(Game *GM) : GameObject()
+Menu::Menu(GameClient *GM) : GameObject()
 {
 	gameManager = GM;
 
