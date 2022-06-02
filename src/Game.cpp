@@ -13,7 +13,6 @@
 #include "Menu.h"
 #include "Image.h"
 
-//#include "../servidores/Chat.h"
 
 
 void GameMessage::to_bin()
@@ -32,6 +31,32 @@ void GameMessage::to_bin()
 		tmp += sizeof(char) * NICK_SIZE;
 
 		memcpy(tmp, message.c_str(), sizeof(char) * message.length());
+	}
+	else if (type == MessageType::CHECKTILE){
+
+		alloc_data(sizeof(type) + sizeof(char) * NICK_SIZE + sizeof(int) * 2);
+		char *tmp = _data;
+		memcpy(tmp, &type, sizeof(type));
+		tmp += sizeof(type);
+		memcpy(tmp, nick.c_str(), sizeof(char) * NICK_SIZE);
+		tmp += sizeof(char) * NICK_SIZE;
+		memcpy(tmp, &x, sizeof(int));
+		tmp += sizeof(int);
+		memcpy(tmp, &y, sizeof(int));
+	}
+	else if (type == MessageType::CHECKTILE2){
+
+		alloc_data(sizeof(type) + sizeof(char) * NICK_SIZE + sizeof(bool));
+		char *tmp = _data;
+		memcpy(tmp, &type, sizeof(type));
+		tmp += sizeof(type);
+		memcpy(tmp, nick.c_str(), sizeof(char) * NICK_SIZE);
+		tmp += sizeof(char) * NICK_SIZE;
+		memcpy(tmp, &x, sizeof(int));
+		tmp += sizeof(int);
+		memcpy(tmp, &y, sizeof(int));
+		tmp += sizeof(int);
+		memcpy(tmp, &boleano1, sizeof(bool));
 	}
 	else //Login, loggout
 	{
@@ -67,6 +92,35 @@ int GameMessage::from_bin(char *data)
 
 		memcpy(&message[0], tmp, sizeof(char) * 80);
 	}
+	else if (type == MessageType::CHECKTILE){
+		
+		nick.resize(sizeof(char) * 8, '\0');
+
+		memcpy(&nick[0], tmp, sizeof(char) * 8);
+		tmp += sizeof(char) * 8;	
+
+		//coordenadas
+	std::cout<<"CheckTile\n";
+		memcpy(&x, tmp, sizeof(int));
+		tmp += sizeof(int);		
+	std::cout<< x<<" CheckTile\n";
+		memcpy(&y, tmp, sizeof(int));
+	std::cout<< y<<" CheckTile\n";
+	}
+	else if (type == MessageType::CHECKTILE2){
+		
+		nick.resize(sizeof(char) * 8, '\0');
+
+		memcpy(&nick[0], tmp, sizeof(char) * 8);
+		tmp += sizeof(char) * 8;	
+		//coordenadas
+		memcpy(&x, tmp, sizeof(int));
+		tmp += sizeof(int);		
+		memcpy(&y, tmp, sizeof(int));
+		tmp += sizeof(int);		
+		//acierto o fallo
+		memcpy(&boleano1, tmp, sizeof(bool));
+	}
 	else //login Logout, etc
 	{
 
@@ -75,28 +129,6 @@ int GameMessage::from_bin(char *data)
 		memcpy(&nick[0], tmp, sizeof(char) * 8);
 		tmp += sizeof(char) * 8;	
 	}
-
-
-
-	//alloc_data(MESSAGE_SIZE);
-
-
-	// Reconstruir la clase usando el buffer _data
-
-
-	//memcpy(static_cast<void *>(_data), bobj, MESSAGE_SIZE);
-
-
-
-
-	// tmp += sizeof(char) * 80;
-
-	// memcpy(&x, tmp, sizeof(int));
-
-	// tmp += sizeof(int);
-	
-	// memcpy(&y, tmp, sizeof(int));
-
 	return 0;
 }
 
@@ -134,14 +166,6 @@ void GameClient::setup()
 	player2 = new Player(this, 1);
 	player2->setTransform(0, 0);
 
-
-	// ChatClient ec("127.0.0.1", "1500", "antonio");
-
-    // std::thread net_thread([&ec](){ ec.net_thread(); });
-
-    // ec.login();
-
-    // ec.input_thread();
 
 }
 
@@ -186,10 +210,10 @@ void GameClient::run()
 					o->handleInput(event);
 
 				//#Controllar input por turnos
-				if (!turno)
-					player->handleInput(event);
-				else
-					player2->handleInput(event);
+				if (turno)
+					//player->handleInput(event);
+				// else
+				 	player2->handleInput(event);
 			}
 		}
 
@@ -411,21 +435,31 @@ void GameServer::do_games(){
 			break;
 
 		case GameMessage::MESSAGE:
-
+			std::cout << msg.nick.c_str() << " mensaje enviado1" << std::endl;
 			for (auto&& sock : clients)
-
 			{
-
 				if (!(*sock == *client))
-
 					socket.send(msg, *sock);
-
 			}
-
-			std::cout << msg.nick.c_str() << " mensaje enviado" << std::endl;
-
+			std::cout << msg.nick.c_str() << " mensaje enviado2" << std::endl;
 			break;
-
+		case GameMessage::CHECKTILE:
+			std::cout << msg.nick.c_str() << " CHECKTILE enviado1" << std::endl;
+			for (auto&& sock : clients)
+			{
+				if (!(*sock == *client))
+					socket.send(msg, *sock);
+			}
+			std::cout << msg.nick.c_str() << " CHECKTILE enviado2" << std::endl;
+			break;
+			case GameMessage::CHECKTILE2:
+			for (auto&& sock : clients)
+			{
+				if (!(*sock == *client))
+					socket.send(msg, *sock);
+			}
+			std::cout << msg.nick.c_str() << " CHECKTILE2 enviado" << std::endl;
+			break;
 		default:
 
 			break;
@@ -469,6 +503,20 @@ void GameClient::WriteMesage(std::string msg){
 	socket.send(em, socket);
 }
 
+void GameClient::CheckTile(int x, int y){
+	std::cout<<"CheckTile\n";
+	GameMessage em(nick, x,y);
+	em.type = GameMessage::CHECKTILE;
+	socket.send(em, socket);
+}
+
+void GameClient::CheckTile2(int x, int y,bool a){
+	std::cout<<"CheckTile2\n";
+	GameMessage em(nick,x,y, a);
+	em.type = GameMessage::CHECKTILE2;
+	socket.send(em, socket);
+}
+
 void GameClient::input_thread()
 
 {
@@ -479,47 +527,6 @@ void GameClient::input_thread()
 	//g->setGameClient(this*);
     run();
     shutdown();
-
-	while (true)
-
-	{
-
-		// Leer stdin con std::getline
-
-		std::string msg;
-
-		std::getline(std::cin, msg);
-
-
-
-		//mensaje para desconectarse del servidor
-
-		if (msg == "LOGOUT")
-
-		{
-
-			logout();
-
-			break;
-
-		}
-
-		else
-
-		{
-
-			// Enviar al servidor usando socket
-
-			GameMessage em(nick, msg);
-
-			em.type = GameMessage::MESSAGE;
-
-			socket.send(em, socket);
-
-		}
-
-	}
-
 }
 
 
@@ -530,31 +537,30 @@ void GameClient::net_thread()
 	while (true)
 
 	{
-
 		//Recibir Mensajes de red
-
 		//Mostrar en pantalla el mensaje de la forma "nick: mensaje"
-
 		GameMessage em;
-
-
-
 		socket.recv(em);
 
 
-
-		if (em.nick != nick) {
-
-
-
-			std::cout << em.nick << ": " << em.message << "\n";
-
+		if (em.type == GameMessage::MessageType::MESSAGE){
+			if (em.nick != nick) {
+				std::cout << em.nick << ": " << em.message << "\n";
+			}
 		}
+		else
+		if (em.type == GameMessage::MessageType::CHECKTILE){
+			player->actualizaCasilla(Vector2D(em.x, em.y));
+		}
+		else
+		if (em.type == GameMessage::MessageType::CHECKTILE2){
+			player2->cambiaCasilla(Vector2D(em.x, em.y), em.boleano1 ? Casilla::tocado : Casilla::agua);
 
+			if (!em.boleano1)
+			turno = !turno;
+		}
 		else {
-
 			std::cout << em.message << "\n";
-
 		}
 
 	}

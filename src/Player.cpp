@@ -51,10 +51,8 @@ void Player::poniendoBarcos()
             // }
             // else
             // {
-
             //# Avisar al servidor de que pusiste tus barcos y estas listo para empezar el juego
             gameManager_->ActualState = GameClient::gameStates::playing;
-
             //}
         }
     }
@@ -77,6 +75,7 @@ void Player::actualizaCasilla(Vector2D pos)
     int x, y;
     x = pos.getX();
     y = pos.getY();
+    std::cout << pos.getX() << " " << pos.getY() << "\n";
 
     if (mapa[y][x]->estadoActual == Casilla::predeterminado)
     {
@@ -89,6 +88,7 @@ void Player::actualizaCasilla(Vector2D pos)
                 {
                     //#Actualizacion de casilla
                     cambiaCasilla(pos, Casilla::tocado);
+                    getGM()->CheckTile2(x, y,true);
                     finded = true;
                     break;
                 }
@@ -97,6 +97,7 @@ void Player::actualizaCasilla(Vector2D pos)
         if (!finded)
         {
             //#Cambio de turno y actualizacion de casilla
+            getGM()->CheckTile2(x,y,false);
             cambiaCasilla(pos, Casilla::agua);
             getGM()->turno = !getGM()->turno;
         }

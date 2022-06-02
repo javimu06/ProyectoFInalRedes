@@ -34,7 +34,11 @@ void Casilla::handleInput(const SDL_Event &e)
                 if (SDL_PointInRect(&mousePoint, &dest))
                 {
                     //# Enviar actualizaCasilla al servidor para que lo mande al cliente 1
-                    player->actualizaCasilla(posicion);
+
+                    player->getGM()->CheckTile(posicion.getX(),posicion.getY());
+                    //player->actualizaCasilla(posicion);
+
+                    std::cout << posicion.getX() << " " << posicion.getY() << "\n";
                 }
             }
         }
