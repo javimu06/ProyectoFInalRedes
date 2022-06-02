@@ -40,8 +40,8 @@ static const size_t MESSAGE_SIZE = sizeof(char) * 88 + sizeof(uint8_t);
     GameMessage(){};
 
     GameMessage(const std::string& n, const std::string& m):nick(n),message(m){};
-    GameMessage(const std::string& n, int _x, int _y):nick(n),x(_x), y(_y){};
-    GameMessage(const std::string& n, int _x, int _y, bool aux):nick(n),x(_x), y(_y),boleano1(aux){};
+    GameMessage(const std::string& n, int16_t _x, int16_t _y):nick(n),x(_x), y(_y){};
+    GameMessage(const std::string& n, int16_t _x, int16_t _y, bool aux):nick(n),x(_x), y(_y),boleano1(aux){};
 
     void to_bin();
 
@@ -51,7 +51,11 @@ static const size_t MESSAGE_SIZE = sizeof(char) * 88 + sizeof(uint8_t);
 
     std::string nick;
     std::string message;
-    int x ,y;
+    
+    int16_t x;
+
+    int16_t y;
+
     bool boleano1;
 
 };

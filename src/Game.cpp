@@ -40,9 +40,9 @@ void GameMessage::to_bin()
 		tmp += sizeof(type);
 		memcpy(tmp, nick.c_str(), sizeof(char) * NICK_SIZE);
 		tmp += sizeof(char) * NICK_SIZE;
-		memcpy(tmp, &x, sizeof(int));
-		tmp += sizeof(int);
-		memcpy(tmp, &y, sizeof(int));
+		memcpy(tmp, &x, sizeof(int16_t));
+		tmp += sizeof(int16_t);
+		memcpy(tmp, &y, sizeof(int16_t));
 	}
 	else if (type == MessageType::CHECKTILE2){
 
@@ -52,10 +52,10 @@ void GameMessage::to_bin()
 		tmp += sizeof(type);
 		memcpy(tmp, nick.c_str(), sizeof(char) * NICK_SIZE);
 		tmp += sizeof(char) * NICK_SIZE;
-		memcpy(tmp, &x, sizeof(int));
-		tmp += sizeof(int);
-		memcpy(tmp, &y, sizeof(int));
-		tmp += sizeof(int);
+		memcpy(tmp, &x, sizeof(int16_t));
+		tmp += sizeof(int16_t);
+		memcpy(tmp, &y, sizeof(int16_t));
+		tmp += sizeof(int16_t);
 		memcpy(tmp, &boleano1, sizeof(bool));
 	}
 	else //Login, loggout
@@ -100,12 +100,9 @@ int GameMessage::from_bin(char *data)
 		tmp += sizeof(char) * 8;	
 
 		//coordenadas
-	std::cout<<"CheckTile\n";
-		memcpy(&x, tmp, sizeof(int));
-		tmp += sizeof(int);		
-	std::cout<< x<<" CheckTile\n";
-		memcpy(&y, tmp, sizeof(int));
-	std::cout<< y<<" CheckTile\n";
+		memcpy(&x, tmp, sizeof(int16_t));
+		tmp += sizeof(int16_t);		
+		memcpy(&y, tmp, sizeof(int16_t));
 	}
 	else if (type == MessageType::CHECKTILE2){
 		
@@ -114,10 +111,10 @@ int GameMessage::from_bin(char *data)
 		memcpy(&nick[0], tmp, sizeof(char) * 8);
 		tmp += sizeof(char) * 8;	
 		//coordenadas
-		memcpy(&x, tmp, sizeof(int));
-		tmp += sizeof(int);		
-		memcpy(&y, tmp, sizeof(int));
-		tmp += sizeof(int);		
+		memcpy(&x, tmp, sizeof(int16_t));
+		tmp += sizeof(int16_t);		
+		memcpy(&y, tmp, sizeof(int16_t));
+		tmp += sizeof(int16_t);		
 		//acierto o fallo
 		memcpy(&boleano1, tmp, sizeof(bool));
 	}
@@ -340,7 +337,6 @@ void GameClient::restart()
 
 void GameClient::changeGameState(gameStates newGS)
 {
-
 	ActualState = newGS;
 }
 
@@ -435,22 +431,20 @@ void GameServer::do_games(){
 			break;
 
 		case GameMessage::MESSAGE:
-			std::cout << msg.nick.c_str() << " mensaje enviado1" << std::endl;
 			for (auto&& sock : clients)
 			{
 				if (!(*sock == *client))
 					socket.send(msg, *sock);
 			}
-			std::cout << msg.nick.c_str() << " mensaje enviado2" << std::endl;
+			std::cout << msg.nick.c_str() << " mensaje enviado" << std::endl;
 			break;
 		case GameMessage::CHECKTILE:
-			std::cout << msg.nick.c_str() << " CHECKTILE enviado1" << std::endl;
 			for (auto&& sock : clients)
 			{
 				if (!(*sock == *client))
 					socket.send(msg, *sock);
 			}
-			std::cout << msg.nick.c_str() << " CHECKTILE enviado2" << std::endl;
+			std::cout << msg.nick.c_str() << " CHECKTILE enviado" << std::endl;
 			break;
 			case GameMessage::CHECKTILE2:
 			for (auto&& sock : clients)
@@ -504,14 +498,12 @@ void GameClient::WriteMesage(std::string msg){
 }
 
 void GameClient::CheckTile(int x, int y){
-	std::cout<<"CheckTile\n";
 	GameMessage em(nick, x,y);
 	em.type = GameMessage::CHECKTILE;
 	socket.send(em, socket);
 }
 
 void GameClient::CheckTile2(int x, int y,bool a){
-	std::cout<<"CheckTile2\n";
 	GameMessage em(nick,x,y, a);
 	em.type = GameMessage::CHECKTILE2;
 	socket.send(em, socket);
