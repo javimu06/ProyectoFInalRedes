@@ -128,8 +128,6 @@ int GameMessage::from_bin(char *data)
 }
 
 
-
-
 void GameClient::init(int w, int h)
 {
 	Environment::init("My Game", w, h);
@@ -162,8 +160,6 @@ void GameClient::setup()
 	player2 = new Player(this, 1);
 	player2->setTransform(0, 0);
 	player2->interactuable = true;
-
-
 }
 
 void GameClient::run()

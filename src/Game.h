@@ -82,6 +82,16 @@ class GameServer{
      * Socket del servidor
      */
     Socket socket;
+
+    struct tablero
+    {
+        int numero;
+        std::unique_ptr<Socket> p1;
+        std::unique_ptr<Socket> p2;
+    };
+    
+    std::vector<tablero> tableros;
+
 };
 
 class GameClient{
