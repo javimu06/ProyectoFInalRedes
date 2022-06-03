@@ -8,7 +8,6 @@
 #include "Environment.h"
 #include "GameObject.h"
 
-#include "Tank.h"
 #include "Button.h"
 #include "Menu.h"
 

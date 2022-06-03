@@ -9,7 +9,7 @@ LDFLAGS = -lSDL2 -lSDL2main -lSDL2_image -lSDL2_ttf
 
 
 # Makefile settings - Can be customized.
-APPNAME = TankerGames.out
+APPNAME = Battleship.out
 EXT = .cpp
 SRCDIR = src
 OBJDIR = obj
