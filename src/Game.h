@@ -46,6 +46,7 @@ public:
     GameMessage(const std::string &n, const std::string &m) : nick(n), message(m){};
     GameMessage(const std::string &n, int16_t _x, int16_t _y) : nick(n), x(_x), y(_y){};
     GameMessage(const std::string &n, int16_t _x, int16_t _y, int16_t a) : nick(n), x(_x), y(_y), b(a){};
+    GameMessage(const std::string &n) : nick(n){};
 
     void to_bin();
 
@@ -119,6 +120,7 @@ public:
      *  Envía el mensaje de logout al servidor
      */
     void logout();
+    void listo();
     void WriteMesage(std::string msg);
     void CheckTile(int x, int y);
     void CheckTile2(int x, int y, int a);
