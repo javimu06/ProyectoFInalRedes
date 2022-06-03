@@ -444,8 +444,6 @@ void GameClient::win()
 
 void GameClient::CheckTile(int x, int y)
 {
-	std::cout << x << " " << y << " "
-			  << "tile1\n";
 	GameMessage em(nick, x, y);
 	em.type = GameMessage::CHECKTILE;
 	socket.send(em, socket);
@@ -453,7 +451,6 @@ void GameClient::CheckTile(int x, int y)
 
 void GameClient::CheckTile2(int x, int y, int a, bool barcos)
 {
-	std::cout << x << " " << y << " " << a << "tile2\n";
 	GameMessage em(nick, x, y, a, barcos);
 	em.type = GameMessage::CHECKEDTILE;
 	socket.send(em, socket);
@@ -487,7 +484,6 @@ void GameClient::net_thread()
 		}
 		else if (em.type == GameMessage::MessageType::CHECKEDTILE)
 		{
-			std::cout << em.x << " " << em.y << " " << em.b << "  procesado 2\n";
 			if (em.b == 1)
 			{
 				player2->cambiaCasilla(Vector2D(em.x, em.y), Casilla::tocado);
