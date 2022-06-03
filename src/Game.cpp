@@ -44,9 +44,9 @@ void GameMessage::to_bin()
 		tmp += sizeof(int16_t);
 		memcpy(tmp, &y, sizeof(int16_t));
 	}
-	else if (type == MessageType::CHECKTILE2){
+	else if (type == MessageType::CHECKEDTILE){
 
-		alloc_data(sizeof(type) + sizeof(char) * NICK_SIZE + sizeof(bool));
+		alloc_data(sizeof(type) + sizeof(char) * NICK_SIZE + sizeof(int16_t) * 3);
 		char *tmp = _data;
 		memcpy(tmp, &type, sizeof(type));
 		tmp += sizeof(type);
@@ -56,7 +56,7 @@ void GameMessage::to_bin()
 		tmp += sizeof(int16_t);
 		memcpy(tmp, &y, sizeof(int16_t));
 		tmp += sizeof(int16_t);
-		memcpy(tmp, &boleano1, sizeof(bool));
+		memcpy(tmp, &b, sizeof(int16_t));
 	}
 	else //Login, loggout
 	{
@@ -104,7 +104,7 @@ int GameMessage::from_bin(char *data)
 		tmp += sizeof(int16_t);		
 		memcpy(&y, tmp, sizeof(int16_t));
 	}
-	else if (type == MessageType::CHECKTILE2){
+	else if (type == MessageType::CHECKEDTILE){
 		
 		nick.resize(sizeof(char) * 8, '\0');
 
@@ -116,7 +116,7 @@ int GameMessage::from_bin(char *data)
 		memcpy(&y, tmp, sizeof(int16_t));
 		tmp += sizeof(int16_t);		
 		//acierto o fallo
-		memcpy(&boleano1, tmp, sizeof(bool));
+		memcpy(&b, tmp, sizeof(int16_t));
 	}
 	else //login Logout, etc
 	{
@@ -446,7 +446,7 @@ void GameServer::do_games(){
 			}
 			std::cout << msg.nick.c_str() << " CHECKTILE enviado" << std::endl;
 			break;
-			case GameMessage::CHECKTILE2:
+			case GameMessage::CHECKEDTILE:
 			for (auto&& sock : clients)
 			{
 				if (!(*sock == *client))
@@ -498,22 +498,22 @@ void GameClient::WriteMesage(std::string msg){
 }
 
 void GameClient::CheckTile(int x, int y){
+	std::cout << x << " " << y << " " << "tile1\n";
 	GameMessage em(nick, x,y);
 	em.type = GameMessage::CHECKTILE;
 	socket.send(em, socket);
 }
 
-void GameClient::CheckTile2(int x, int y,bool a){
+void GameClient::CheckTile2(int x, int y, int a){
+	std::cout << x << " " << y << " " << a << "tile2\n";
 	GameMessage em(nick,x,y, a);
-	em.type = GameMessage::CHECKTILE2;
+	em.type = GameMessage::CHECKEDTILE;
 	socket.send(em, socket);
 }
 
 void GameClient::input_thread()
-
 {
 	//este es el ciclo del juego principal, aqui vamso a iniciar el game
-
 	//abrir el game
 	init(1920*scale, 1080*scale);
 	//g->setGameClient(this*);
@@ -537,7 +537,7 @@ void GameClient::net_thread()
 
 		if (em.type == GameMessage::MessageType::MESSAGE){
 			if (em.nick != nick) {
-				std::cout << em.nick << ": " << em.message << "\n";
+				std::cout << em.nick << ": " << em.message << " procesado 1\n";
 			}
 		}
 		else
@@ -545,11 +545,16 @@ void GameClient::net_thread()
 			player->actualizaCasilla(Vector2D(em.x, em.y));
 		}
 		else
-		if (em.type == GameMessage::MessageType::CHECKTILE2){
-			player2->cambiaCasilla(Vector2D(em.x, em.y), em.boleano1 ? Casilla::tocado : Casilla::agua);
-
-			if (!em.boleano1)
-			turno = !turno;
+		if (em.type == GameMessage::MessageType::CHECKEDTILE){
+			std::cout<< em.x << " "<< em.y<< " " << em.b << "  procesado 2\n";
+			if (em.b == 1){
+				player2->cambiaCasilla(Vector2D(em.x, em.y), Casilla::tocado);
+			}
+			else
+			if (em.b == 0){
+				player2->cambiaCasilla(Vector2D(em.x, em.y), Casilla::agua);
+				turno = !turno;	
+			}
 		}
 		else {
 			std::cout << em.message << "\n";

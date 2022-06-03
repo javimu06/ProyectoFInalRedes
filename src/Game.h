@@ -34,14 +34,14 @@ static const size_t MESSAGE_SIZE = sizeof(char) * 88 + sizeof(uint8_t);
         MESSAGE = 1,
         LOGOUT  = 2,
         CHECKTILE = 3,
-        CHECKTILE2 = 4
+        CHECKEDTILE = 4
     };
 
     GameMessage(){};
 
     GameMessage(const std::string& n, const std::string& m):nick(n),message(m){};
     GameMessage(const std::string& n, int16_t _x, int16_t _y):nick(n),x(_x), y(_y){};
-    GameMessage(const std::string& n, int16_t _x, int16_t _y, bool aux):nick(n),x(_x), y(_y),boleano1(aux){};
+    GameMessage(const std::string& n, int16_t _x, int16_t _y, int16_t a):nick(n),x(_x), y(_y),b(a){};
 
     void to_bin();
 
@@ -56,7 +56,7 @@ static const size_t MESSAGE_SIZE = sizeof(char) * 88 + sizeof(uint8_t);
 
     int16_t y;
 
-    bool boleano1;
+    int16_t b;
 
 };
 
@@ -106,7 +106,7 @@ class GameClient{
     void logout();
     void WriteMesage(std::string msg);
     void CheckTile(int x, int y);
-    void CheckTile2(int x, int y, bool a);
+    void CheckTile2(int x, int y, int a);
 
     /**
      *  Rutina principal para el Thread de E/S. Lee datos de STDIN (std::getline)
