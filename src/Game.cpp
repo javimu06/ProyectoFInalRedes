@@ -16,9 +16,7 @@
 
 
 void GameMessage::to_bin()
-
 {
-
 	if (type == MessageType::MESSAGE){
 
 		alloc_data(MESSAGE_SIZE);
@@ -159,9 +157,11 @@ void GameClient::setup()
 	// Players
 	player = new Player(this, 0);
 	player->setTransform(0, 0);
+	
 
 	player2 = new Player(this, 1);
 	player2->setTransform(0, 0);
+	player2->interactuable = true;
 
 
 }
@@ -178,10 +178,6 @@ void GameClient::run()
 		// handle input
 		while (SDL_PollEvent(&event))
 		{
-
-			if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.scancode == SDL_SCANCODE_T))
-			WriteMesage("hola");
-
 			if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && event.key.keysym.scancode == SDL_SCANCODE_ESCAPE))
 			{
 				ActualState = gameStates::quit;
@@ -207,10 +203,10 @@ void GameClient::run()
 					o->handleInput(event);
 
 				//#Controllar input por turnos
-				if (turno)
+				if (turno){}
 					//player->handleInput(event);
 				// else
-				 	player2->handleInput(event);
+				 	//player2->handleInput(event);
 			}
 		}
 

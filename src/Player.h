@@ -36,6 +36,7 @@ public:
 
     int nJugador;
     bool alive = true;
+    bool interactuable = false;
 
 private:
     GameClient *gameManager_;
