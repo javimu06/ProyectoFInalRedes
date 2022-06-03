@@ -122,13 +122,13 @@ public:
     void WriteMesage(std::string msg);
     void CheckTile(int x, int y);
     void CheckTile2(int x, int y, int a);
+    void Readdy();
 
     /**
      *  Rutina principal para el Thread de E/S. Lee datos de STDIN (std::getline)
      *  y los envía por red vía el Socket.
      */
     void input_thread();
-
     /**
      *  Rutina del thread de Red. Recibe datos de la red y los "renderiza"
      *  en STDOUT
