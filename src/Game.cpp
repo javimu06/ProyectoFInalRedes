@@ -353,6 +353,25 @@ void GameServer::do_games()
 
 	while (true)
 	{
+
+		/*
+
+		 * NOTA: los clientes están definidos con "smart pointers", es necesario
+
+		 * crear un unique_ptr con el objeto socket recibido y usar std::move
+
+		 * para añadirlo al vector
+
+		 */
+
+		// Recibir Mensajes en y en función del tipo de mensaje
+
+		// - LOGIN: Añadir al vector clients
+
+		// - LOGOUT: Eliminar del vector clients
+
+		// - MESSAGE: Reenviar el mensaje a todos los clientes (menos el emisor)
+
 		Socket *client;
 		GameMessage msg;
 
@@ -372,87 +391,98 @@ void GameServer::do_games()
 
 		std::unique_ptr<Socket> soc(client);
 
-		if (msg.type == GameMessage::LOGIN)
+		switch (msg.type) // LOGIN = 0, MESSAGE = 1, LOGOUT = 2
+
 		{
+
+		case GameMessage::LOGIN:
+
 			// soc = std::unique_ptr<Socket>(client) ;
+
 			clients.push_back(std::move(soc));
+
 			std::cout << msg.nick.c_str() << " logeado " << std::endl;
-		}
-		else if (msg.type == GameMessage::LOGOUT)
-		{
+
+			break;
+
+		case GameMessage::LOGOUT:
+
 			for (auto &&sock : clients)
+
 			{
+
 				if ((*sock == *client))
+
 				{
+
 					clients.erase(clients.begin() + count);
+
 					break;
 				}
+
 				count++;
 			}
+
 			std::cout << msg.nick.c_str() << " desconectado" << std::endl;
-		}
-		else if (msg.type == GameMessage::READY)
-		{
-			for (auto &&sock : clients)
-			{
-				if ((*sock == *client))
-				{
-					std::cout << msg.nick.c_str() << " esta listo" << std::endl;
-					// clients.erase(clients.begin() + count);
-					break;
-				}
-			}
-		}
-		else if (msg.type == GameMessage::MESSAGE)
-		{
+
+			break;
+
+		case GameMessage::MESSAGE:
 			for (auto &&sock : clients)
 			{
 				if (!(*sock == *client))
 					socket.send(msg, *sock);
 			}
 			std::cout << msg.nick.c_str() << " mensaje enviado" << std::endl;
-		}
-		else if (msg.type == GameMessage::CHECKTILE){
+			break;
+		case GameMessage::CHECKTILE:
 			for (auto &&sock : clients)
 			{
 				if (!(*sock == *client))
 					socket.send(msg, *sock);
 			}
 			std::cout << msg.nick.c_str() << " CHECKTILE enviado" << std::endl;
-		}
-		else if (msg.type == GameMessage::CHECKEDTILE){
+			break;
+		case GameMessage::CHECKEDTILE:
 			for (auto &&sock : clients)
 			{
 				if (!(*sock == *client))
 					socket.send(msg, *sock);
 			}
 			std::cout << msg.nick.c_str() << " CHECKTILE2 enviado" << std::endl;
+			break;
+		default:
+
+			break;
 		}
 
 		std::cout << "Conectado: " << clients.size() << std::endl;
+
+		//	}
 	}
 }
 
 // el cliente
 void GameClient::login()
+
 {
-	GameMessage em(nick);
+
+	std::string msg;
+	GameMessage em(nick, msg);
+
 	em.type = GameMessage::LOGIN;
+
 	socket.send(em, socket);
 }
 
 void GameClient::logout()
 {
-	GameMessage em(nick);
+	std::string msg;
+	GameMessage em(nick, msg);
 	em.type = GameMessage::LOGOUT;
 	socket.send(em, socket);
 }
-void GameClient::listo()
-{
-	GameMessage em(nick);
-	em.type = GameMessage::READY;
-	socket.send(em, socket);
-}
+
 void GameClient::WriteMesage(std::string msg)
 {
 	GameMessage em(nick, msg);

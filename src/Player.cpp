@@ -53,7 +53,6 @@ void Player::poniendoBarcos()
             // {
             //# Avisar al servidor de que pusiste tus barcos y estas listo para empezar el juego
             gameManager_->ActualState = GameClient::gameStates::playing;
-            //gameManager_->listo();
             //}
         }
     }
