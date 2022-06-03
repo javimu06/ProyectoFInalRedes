@@ -327,25 +327,6 @@ void GameServer::do_games()
 
 	while (true)
 	{
-
-		/*
-
-		 * NOTA: los clientes están definidos con "smart pointers", es necesario
-
-		 * crear un unique_ptr con el objeto socket recibido y usar std::move
-
-		 * para añadirlo al vector
-
-		 */
-
-		// Recibir Mensajes en y en función del tipo de mensaje
-
-		// - LOGIN: Añadir al vector clients
-
-		// - LOGOUT: Eliminar del vector clients
-
-		// - MESSAGE: Reenviar el mensaje a todos los clientes (menos el emisor)
-
 		Socket *client;
 		GameMessage msg;
 
@@ -356,10 +337,6 @@ void GameServer::do_games()
 
 			continue;
 		}
-
-		// while (true)
-
-		//{
 
 		int count = 0;
 
@@ -372,41 +349,39 @@ void GameServer::do_games()
 		case GameMessage::LOGIN:
 
 			// soc = std::unique_ptr<Socket>(client) ;
+			if (clients.size() < 2)
+			{
+				clients.push_back(std::move(soc));
 
-			clients.push_back(std::move(soc));
-
-			std::cout << msg.nick.c_str() << " logeado " << std::endl;
-
+				std::cout << msg.nick.c_str() << " logeado " << std::endl;
+			}
 			break;
 
 		case GameMessage::LOGOUT:
-
 			for (auto &&sock : clients)
-
 			{
-
 				if ((*sock == *client))
-
 				{
-
 					clients.erase(clients.begin() + count);
-
 					break;
 				}
-
 				count++;
 			}
-
 			std::cout << msg.nick.c_str() << " desconectado" << std::endl;
 
 			break;
 
 		case GameMessage::READY:
-			for (auto &&sock : clients)
+			readyPlayers++;
+			if (readyPlayers == 2)
 			{
-				if (!(*sock == *client))
-					socket.send(msg, *sock);
+				for (auto &&sock : clients)
+				{
+					if (!(*sock == *client))
+						socket.send(msg, *sock);
+				}
 			}
+
 			std::cout << msg.nick.c_str() << " mensaje enviado" << std::endl;
 			break;
 		case GameMessage::CHECKTILE:
@@ -451,6 +426,13 @@ void GameClient::logout()
 {
 	GameMessage em(nick);
 	em.type = GameMessage::LOGOUT;
+	socket.send(em, socket);
+}
+
+void GameClient::ready()
+{
+	GameMessage em(nick);
+	em.type = GameMessage::READY;
 	socket.send(em, socket);
 }
 
@@ -509,6 +491,10 @@ void GameClient::net_thread()
 				player2->cambiaCasilla(Vector2D(em.x, em.y), Casilla::agua);
 				turno = !turno;
 			}
+		}
+		else if (em.type == GameMessage::MessageType::READY)
+		{
+			turno = !turno;
 		}
 	}
 }

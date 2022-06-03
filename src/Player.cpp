@@ -53,6 +53,7 @@ void Player::poniendoBarcos()
             // {
             //# Avisar al servidor de que pusiste tus barcos y estas listo para empezar el juego
             gameManager_->ActualState = GameClient::gameStates::playing;
+            gameManager_->ready();
             //}
         }
     }
@@ -88,7 +89,7 @@ void Player::actualizaCasilla(Vector2D pos)
                 {
                     //#Actualizacion de casilla
                     cambiaCasilla(pos, Casilla::tocado);
-                    getGM()->CheckTile2(x, y,1);
+                    getGM()->CheckTile2(x, y, 1);
                     finded = true;
                     break;
                 }
@@ -97,7 +98,7 @@ void Player::actualizaCasilla(Vector2D pos)
         if (!finded)
         {
             //#Cambio de turno y actualizacion de casilla
-            getGM()->CheckTile2(x,y,0);
+            getGM()->CheckTile2(x, y, 0);
             cambiaCasilla(pos, Casilla::agua);
             getGM()->turno = !getGM()->turno;
         }

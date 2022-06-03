@@ -86,14 +86,7 @@ private:
      */
     Socket socket;
 
-    struct tablero
-    {
-        int numero;
-        std::unique_ptr<Socket> p1;
-        std::unique_ptr<Socket> p2;
-    };
-
-    std::vector<tablero> tableros;
+    int readyPlayers = 0;
 };
 
 class GameClient
@@ -117,6 +110,7 @@ public:
      *  Envía el mensaje de logout al servidor
      */
     void logout();
+    void ready();
     void CheckTile(int x, int y);
     void CheckTile2(int x, int y, int a);
 
