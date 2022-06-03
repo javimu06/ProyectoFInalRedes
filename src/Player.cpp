@@ -89,7 +89,7 @@ void Player::actualizaCasilla(Vector2D pos)
                 {
                     //#Actualizacion de casilla
                     cambiaCasilla(pos, Casilla::tocado);
-                    getGM()->CheckTile2(x, y, 1);
+                    getGM()->CheckTile2(x, y, 1, !tieneBarcos());
                     finded = true;
                     break;
                 }
@@ -98,7 +98,7 @@ void Player::actualizaCasilla(Vector2D pos)
         if (!finded)
         {
             //#Cambio de turno y actualizacion de casilla
-            getGM()->CheckTile2(x, y, 0);
+            getGM()->CheckTile2(x, y, 0, !tieneBarcos());
             cambiaCasilla(pos, Casilla::agua);
             getGM()->turno = !getGM()->turno;
         }

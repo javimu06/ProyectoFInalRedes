@@ -34,17 +34,17 @@ public:
         LOGIN = 0,
         LOGOUT = 1,
         READY = 2,
-        TABLERO = 3,
-        START = 4,
-        CHECKTILE = 5,
-        CHECKEDTILE = 6
+        START = 3,
+        CHECKTILE = 4,
+        CHECKEDTILE = 5,
+        WIN = 6
     };
 
     GameMessage(){};
 
     GameMessage(const std::string &n) : nick(n){};
     GameMessage(const std::string &n, int16_t _x, int16_t _y) : nick(n), x(_x), y(_y){};
-    GameMessage(const std::string &n, int16_t _x, int16_t _y, int16_t a) : nick(n), x(_x), y(_y), b(a){};
+    GameMessage(const std::string &n, int16_t _x, int16_t _y, int16_t a, bool winP) : nick(n), x(_x), y(_y), b(a), win(winP){};
 
     void to_bin();
 
@@ -59,6 +59,8 @@ public:
     int16_t y;
 
     int16_t b;
+
+    bool win;
 };
 
 class GameServer
@@ -111,8 +113,10 @@ public:
      */
     void logout();
     void ready();
+    void win();
+
     void CheckTile(int x, int y);
-    void CheckTile2(int x, int y, int a);
+    void CheckTile2(int x, int y, int a, bool w);
 
     /**
      *  Rutina principal para el Thread de E/S. Lee datos de STDIN (std::getline)
