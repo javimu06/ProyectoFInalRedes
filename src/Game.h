@@ -33,8 +33,11 @@ static const size_t MESSAGE_SIZE = sizeof(char) * 88 + sizeof(uint8_t);
         LOGIN   = 0,
         MESSAGE = 1,
         LOGOUT  = 2,
-        CHECKTILE = 3,
-        CHECKEDTILE = 4
+        READY = 3,
+        TABLERO = 4,
+        START = 5,
+        CHECKTILE = 6,
+        CHECKEDTILE = 7
     };
 
     GameMessage(){};
