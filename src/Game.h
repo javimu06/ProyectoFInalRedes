@@ -11,6 +11,7 @@
 
 #include "macros.h"
 #include "Player.h"
+#include "Image.h"
 
 #include "Serializable.h"
 #include "Socket.h"
@@ -18,11 +19,11 @@
 class GameObject;
 class SDL_Renderer;
 
+class GameMessage : public Serializable
+{
 
-class GameMessage: public Serializable{
-
-    public:
-static const size_t MESSAGE_SIZE = sizeof(char) * 88 + sizeof(uint8_t);
+public:
+    static const size_t MESSAGE_SIZE = sizeof(char) * 88 + sizeof(uint8_t);
 
     static const size_t NICK_SIZE = 8;
 
@@ -30,9 +31,9 @@ static const size_t MESSAGE_SIZE = sizeof(char) * 88 + sizeof(uint8_t);
 
     enum MessageType
     {
-        LOGIN   = 0,
+        LOGIN = 0,
         MESSAGE = 1,
-        LOGOUT  = 2,
+        LOGOUT = 2,
         READY = 3,
         TABLERO = 4,
         START = 5,
@@ -42,30 +43,30 @@ static const size_t MESSAGE_SIZE = sizeof(char) * 88 + sizeof(uint8_t);
 
     GameMessage(){};
 
-    GameMessage(const std::string& n, const std::string& m):nick(n),message(m){};
-    GameMessage(const std::string& n, int16_t _x, int16_t _y):nick(n),x(_x), y(_y){};
-    GameMessage(const std::string& n, int16_t _x, int16_t _y, int16_t a):nick(n),x(_x), y(_y),b(a){};
+    GameMessage(const std::string &n, const std::string &m) : nick(n), message(m){};
+    GameMessage(const std::string &n, int16_t _x, int16_t _y) : nick(n), x(_x), y(_y){};
+    GameMessage(const std::string &n, int16_t _x, int16_t _y, int16_t a) : nick(n), x(_x), y(_y), b(a){};
 
     void to_bin();
 
-    int from_bin(char * bobj);
+    int from_bin(char *bobj);
 
     uint8_t type;
 
     std::string nick;
     std::string message;
-    
+
     int16_t x;
 
     int16_t y;
 
     int16_t b;
-
 };
 
-class GameServer{
-    public:
-    GameServer(const char * s, const char * p): socket(s, p)
+class GameServer
+{
+public:
+    GameServer(const char *s, const char *p) : socket(s, p)
     {
         socket.bind();
     };
@@ -74,7 +75,8 @@ class GameServer{
      *  lo distribuye a los clientes. Mantiene actualizada la lista de clientes
      */
     void do_games();
-    private:
+
+private:
     /**
      *  Lista de clientes conectados al servidor de Chat, representados por
      *  su socket
@@ -92,21 +94,21 @@ class GameServer{
         std::unique_ptr<Socket> p1;
         std::unique_ptr<Socket> p2;
     };
-    
-    std::vector<tablero> tableros;
 
+    std::vector<tablero> tableros;
 };
 
-class GameClient{
+class GameClient
+{
 
- public:
+public:
     /**
      * @param s dirección del servidor
      * @param p puerto del servidor
      * @param n nick del usuario
      */
-    GameClient(const char * s, const char * p, const char * n):socket(s, p),
-        nick(n){};
+    GameClient(const char *s, const char *p, const char *n) : socket(s, p),
+                                                              nick(n){};
 
     /**
      *  Envía el mensaje de login al servidor
@@ -134,7 +136,6 @@ class GameClient{
     void net_thread();
 
 private:
-
     /**
      * Socket para comunicar con el servidor
      */
@@ -145,10 +146,8 @@ private:
      */
     std::string nick;
 
-
-//EL GAME
+    // EL GAME
 public:
-
     void init(int w, int h);
     void setup();
     void run();
@@ -185,7 +184,7 @@ private:
 
     Player *player;
     Player *player2;
+    Image *turnIndicator;
 };
-
 
 #endif
