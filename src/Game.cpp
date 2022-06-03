@@ -452,6 +452,11 @@ void GameServer::do_games()
 			}
 			std::cout << msg.nick.c_str() << " CHECKTILE2 enviado" << std::endl;
 			break;
+
+		case GameMessage::READY:
+
+			std::cout << msg.nick.c_str() << " esta readdy" << std::endl;
+			break;
 		default:
 
 			break;
@@ -493,8 +498,6 @@ void GameClient::WriteMesage(std::string msg)
 
 void GameClient::CheckTile(int x, int y)
 {
-	std::cout << x << " " << y << " "
-			  << "tile1\n";
 	GameMessage em(nick, x, y);
 	em.type = GameMessage::CHECKTILE;
 	socket.send(em, socket);
@@ -502,9 +505,16 @@ void GameClient::CheckTile(int x, int y)
 
 void GameClient::CheckTile2(int x, int y, int a)
 {
-	std::cout << x << " " << y << " " << a << "tile2\n";
 	GameMessage em(nick, x, y, a);
 	em.type = GameMessage::CHECKEDTILE;
+	socket.send(em, socket);
+}
+
+void GameClient::Readdy()
+{
+	std::string msg;
+	GameMessage em(nick,msg);
+	em.type = GameMessage::READY;
 	socket.send(em, socket);
 }
 
