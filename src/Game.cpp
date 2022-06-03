@@ -13,21 +13,7 @@
 
 void GameMessage::to_bin()
 {
-	if (type == MessageType::MESSAGE)
-	{
-
-		alloc_data(MESSAGE_SIZE);
-		char *tmp = _data;
-
-		memcpy(tmp, &type, sizeof(type));
-		tmp += sizeof(type);
-
-		memcpy(tmp, nick.c_str(), sizeof(char) * NICK_SIZE);
-		tmp += sizeof(char) * NICK_SIZE;
-
-		memcpy(tmp, message.c_str(), sizeof(char) * message.length());
-	}
-	else if (type == MessageType::CHECKTILE)
+	if (type == MessageType::CHECKTILE)
 	{
 
 		alloc_data(sizeof(type) + sizeof(char) * NICK_SIZE + sizeof(int) * 2);
@@ -77,19 +63,7 @@ int GameMessage::from_bin(char *data)
 	memcpy(&type, tmp, sizeof(type));
 	tmp += sizeof(type);
 
-	if (type == MessageType::MESSAGE)
-	{
-
-		nick.resize(sizeof(char) * 8, '\0');
-
-		memcpy(&nick[0], tmp, sizeof(char) * 8);
-		tmp += sizeof(char) * 8;
-
-		message.resize(sizeof(char) * 80, '\0');
-
-		memcpy(&message[0], tmp, sizeof(char) * 80);
-	}
-	else if (type == MessageType::CHECKTILE)
+	if (type == MessageType::CHECKTILE)
 	{
 
 		nick.resize(sizeof(char) * 8, '\0');
@@ -427,7 +401,7 @@ void GameServer::do_games()
 
 			break;
 
-		case GameMessage::MESSAGE:
+		case GameMessage::READY:
 			for (auto &&sock : clients)
 			{
 				if (!(*sock == *client))
@@ -466,9 +440,7 @@ void GameServer::do_games()
 void GameClient::login()
 
 {
-
-	std::string msg;
-	GameMessage em(nick, msg);
+	GameMessage em(nick);
 
 	em.type = GameMessage::LOGIN;
 
@@ -477,16 +449,8 @@ void GameClient::login()
 
 void GameClient::logout()
 {
-	std::string msg;
-	GameMessage em(nick, msg);
+	GameMessage em(nick);
 	em.type = GameMessage::LOGOUT;
-	socket.send(em, socket);
-}
-
-void GameClient::WriteMesage(std::string msg)
-{
-	GameMessage em(nick, msg);
-	em.type = GameMessage::MESSAGE;
 	socket.send(em, socket);
 }
 
@@ -529,14 +493,7 @@ void GameClient::net_thread()
 		GameMessage em;
 		socket.recv(em);
 
-		if (em.type == GameMessage::MessageType::MESSAGE)
-		{
-			if (em.nick != nick)
-			{
-				std::cout << em.nick << ": " << em.message << " procesado 1\n";
-			}
-		}
-		else if (em.type == GameMessage::MessageType::CHECKTILE)
+		if (em.type == GameMessage::MessageType::CHECKTILE)
 		{
 			player->actualizaCasilla(Vector2D(em.x, em.y));
 		}
@@ -552,10 +509,6 @@ void GameClient::net_thread()
 				player2->cambiaCasilla(Vector2D(em.x, em.y), Casilla::agua);
 				turno = !turno;
 			}
-		}
-		else
-		{
-			std::cout << em.message << "\n";
 		}
 	}
 }

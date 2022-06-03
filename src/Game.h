@@ -32,18 +32,17 @@ public:
     enum MessageType
     {
         LOGIN = 0,
-        MESSAGE = 1,
-        LOGOUT = 2,
-        READY = 3,
-        TABLERO = 4,
-        START = 5,
-        CHECKTILE = 6,
-        CHECKEDTILE = 7
+        LOGOUT = 1,
+        READY = 2,
+        TABLERO = 3,
+        START = 4,
+        CHECKTILE = 5,
+        CHECKEDTILE = 6
     };
 
     GameMessage(){};
 
-    GameMessage(const std::string &n, const std::string &m) : nick(n), message(m){};
+    GameMessage(const std::string &n) : nick(n){};
     GameMessage(const std::string &n, int16_t _x, int16_t _y) : nick(n), x(_x), y(_y){};
     GameMessage(const std::string &n, int16_t _x, int16_t _y, int16_t a) : nick(n), x(_x), y(_y), b(a){};
 
@@ -54,7 +53,6 @@ public:
     uint8_t type;
 
     std::string nick;
-    std::string message;
 
     int16_t x;
 
@@ -119,7 +117,6 @@ public:
      *  Envía el mensaje de logout al servidor
      */
     void logout();
-    void WriteMesage(std::string msg);
     void CheckTile(int x, int y);
     void CheckTile2(int x, int y, int a);
 
